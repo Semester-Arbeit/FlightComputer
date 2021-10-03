@@ -11,7 +11,7 @@
 //Autor: Tobias Rothlin
 //---------------------------------------------------------------------------
 //Methods:
-//            void FlightControls() -> Constructor initalises the 5 PWM signals and sets the start values: ESC -> 0
+//            FlightControls() -> Constructor initalises the 5 PWM signals and sets the start values: ESC -> 0
 //                                                                                                    Servos -> Custom offset (default 90)
 //
 //            void enterTransportMode() -> Turns all ailerons to a vertival positio so the do not break during transport.
@@ -195,7 +195,7 @@ class FlightControls
       setAilerons(0, 20, -20);
       delay(250);
 
-      resetAilerons();
+      restAilerons();
     }
 
   private:
