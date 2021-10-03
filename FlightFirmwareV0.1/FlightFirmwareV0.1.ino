@@ -1,22 +1,43 @@
 #include <Servo.h>
+#include <mbed.h>
 #include <Arduino_PortentaBreakout.h>
-
-
-breakoutPin Motor = PWM0;
-breakoutPin servos[] = {PWM1,PWM2,PWM3,PWM4};
-
+#include "FlightControls.h"
 
 
 void setup() {
- pinMode(pwmPins[0], OUTPUT);
- pinMode(pwmPins[1], OUTPUT);
- pinMode(pwmPins[2], OUTPUT);
- pinMode(pwmPins[3], OUTPUT);
- pinMode(Motor, OUTPUT);
+  Serial.begin(9600);
+  pinMode(LEDR, OUTPUT);
+  pinMode(LEDG, OUTPUT);
+  pinMode(LEDB, OUTPUT);
+  digitalWrite(LEDR, HIGH);
+  digitalWrite(LEDG, HIGH);
+  digitalWrite(LEDB, HIGH);
+
+  //Initalise Flight Controls
+  FlightControls flightControlSystem = FlightControls();
+  flightControlSystem.testAilerons();
+  digitalWrite(LEDR, LOW); //Flight Control Initalised
+
+  //Initalise Sensors
+  digitalWrite(LEDG, LOW); //Seonsors Initalised
+
+  //Initalise Control System
+  digitalWrite(LEDB, LOW); //Control System Initalised
+
+  //Initalise Wifi Network
+  digitalWrite(LEDR, HIGH);
+  digitalWrite(LEDB, HIGH); //Wifi Network System Initalised /Ready to Use
+
+  for( int i= 0; i<10; i++)
+  {
+    digitalWrite(LEDG, LOW);
+    delay(250);
+    digitalWrite(LEDG, HIGH);
+    delay(250);
+  }
 
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
 
 }
