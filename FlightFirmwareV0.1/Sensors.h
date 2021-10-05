@@ -39,10 +39,10 @@ class Sensors
       if (imu.begin() &&  GPS.begin())
       {
         updateIMUData();
-        while (GPS.satellites() < 3) //Waitting to connect to at leaast 3 Sat
-        {
-          delay(200);
-        }
+//        while (GPS.satellites() < 3) //Waitting to connect to at leaast 3 Sat
+//        {
+//          delay(200);
+//        }
         updateCurrentSpeed();
         return true;
       }
@@ -60,7 +60,13 @@ class Sensors
 
     double* getSpeed()
     {
+      updateCurrentSpeed();
       return currentSpeed;
+    }
+
+    int getNumberOfSatellites()
+    {
+      return GPS.satellites();
     }
 
   private:
@@ -75,9 +81,14 @@ class Sensors
     void updateIMUData()
     {
       imu::Vector<3> euler = imu.getVector(Adafruit_BNO055::VECTOR_EULER);
-      currentAttitude[0] = euler.x();
-      currentAttitude[1] = euler.y();
-      currentAttitude[2] = euler.z();
+      currentAttitude[0] = euler.y();
+      currentAttitude[1] = euler.z();
+      double yaw = euler.x();
+      if(yaw > 180)
+      {
+        yaw = yaw - 360;
+      }
+      currentAttitude[2] = yaw;
     }
 
     void updateCurrentSpeed()
