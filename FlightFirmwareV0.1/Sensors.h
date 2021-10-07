@@ -36,14 +36,13 @@ class Sensors
 
     bool init()
     {
-      if (imu.begin() &&  GPS.begin())
+      if (imu.begin())
       {
         updateIMUData();
 //        while (GPS.satellites() < 3) //Waitting to connect to at leaast 3 Sat
 //        {
 //          delay(200);
 //        }
-        updateCurrentSpeed();
         return true;
       }
       else

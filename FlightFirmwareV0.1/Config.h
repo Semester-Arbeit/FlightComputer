@@ -2,10 +2,10 @@
 #define CONFIG_H_
 
 
-//The Class to handle all configurtion Parameters
+//The Class to handle all configuration Parameters
 //---------------------------------------------------------------------------
 //Version: V0.1
-//Autor: Tobias Rothlin
+//Author: Tobias Rothlin
 //---------------------------------------------------------------------------
 //Methods:
 //            Config() -> Initalies the defaut values
@@ -14,6 +14,7 @@
 class Config
 {
   public:
+
     Config()
     {
 
@@ -28,7 +29,22 @@ class Config
     {
       servoOffset[index] = offset;
     }
-    
+
+    double** getKValuesForController()
+    {
+      return KValuesForController;
+    }
+
+    unsigned long* getFlightKeyFrames_ExecutionTime()
+    {
+      return FlightKeyFrames_ExecutionTime;
+    }
+
+    double** getFlightKeyFrames_attitude()
+    {
+      return FlightKeyFrames_attitude;
+    }
+
 
 
   private:
@@ -37,30 +53,26 @@ class Config
     const double defaultServoOffset = 90;
     double servoOffset[4] = {defaultServoOffset + 2, defaultServoOffset + 2.5, defaultServoOffset + 8.5, defaultServoOffset + 10};
 
-    
+
     //Control System: Kp,Ki,Kd
-    double pitchK[3] = {0,0,0};
-    double rollK[3] = {0,0,0};
-    double yawK[3] = {0,0,0};
+    double pitchK[3] = {-3, 0, 0};
+    double rollK[3] = {1, 0, 0};
+    double yawK[3] = {1, 0, 0};
+
+    double* KValuesForController[3] = {pitchK, rollK, yawK};
 
     //FlightParameters:
     const int numberOfKeyframes = 10;
-    
-    struct flightParameters{
-      unsigned long executionTime;
-      double attitude[3];
-      double altitude;
+
 
     //Wifi Settings:
 
 
     //LoggingSettings:
-      
-    };
 
-    flightParameters FlightKeyFrames[10];
-    
-    //
+    unsigned long FlightKeyFrames_ExecutionTime[10];
+    double* FlightKeyFrames_attitude[10];
+    double FlightKeyFrames_altitude[10];
 
 };
 

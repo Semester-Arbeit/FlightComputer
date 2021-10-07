@@ -9,35 +9,37 @@
 //Autor: Tobias Rothlin
 //---------------------------------------------------------------------------
 //Methods:
-//            ControlSystem(double** kValues, double** currentValues, double** aleronPoition, double** targetValue) -> Initalies PID Controllers
+//            ControlSystem(double** kValues, double** currentValues, double** aleronPosition, double** targetValue) -> Initalies PID Controllers
 //                          kValues -> double [[KpPitch, KiPitch, KdPitch],[KpRoll, KiRoll, KdRoll], [KpYaw, KiYaw, Kdyaw]
-//                          currentValues -> double [&pitch,&roll,&yaw]
-//                          aleronPosition -> double [&pitch,&roll,&yaw]
-//                          targetValues -> double [&pitch,&roll,&yaw]
+
 
 
 class ControlSystem
 {
   public:
-    ControlSystem(double** kValues, double** currentValues, double** aleronPoition, double** targetValue)
+    ControlSystem(double** kValues, double* sensPitch, double* sensRoll, double* sensYaw, double* correctionPitch, double* correctionRoll, double* correctionYaw, double* targetPitch, double* targetRoll, double* targetYaw)
     {
-      for( int i = 0; i < 3; i++)
-      {
-        controlInstances[i] = PID(currentValues[i],aleronPoition[i],targetValue[i],kValues[i][0],kValues[i][1],,kValues[i][2], DIRECT);
-        controlInstances[i].SetMode(AUTOMATIC);
-      }
+      PIDpitch = new PID(sensPitch, correctionPitch, targetPitch, kValues[0][0], kValues[0][1], kValues[0][2], DIRECT);
+      PIDpitch->SetMode(AUTOMATIC);
+
+      PIDroll = new PID(sensRoll, correctionRoll, targetRoll, kValues[1][0], kValues[1][1], kValues[1][2], DIRECT);
+      PIDroll->SetMode(AUTOMATIC);
+
+      PIDyaw = new PID(sensYaw, correctionYaw, targetYaw, kValues[2][0], kValues[2][1], kValues[2][2], DIRECT);
+      PIDyaw->SetMode(AUTOMATIC);
     }
 
-    updateValues()
+    void updateValues()
     {
-      for( int i = 0; i < 3; i++)
-      {
-        controlInstances[i]..Compute();
-      }
+      PIDpitch->Compute();
+      PIDroll->Compute();
+      PIDyaw->Compute();
     }
-    
+
   private:
-    PID controlInstances[3];
+    PID* PIDpitch;
+    PID* PIDroll;
+    PID* PIDyaw;
 };
 
 #endif /*CONTROLSYSTEM_H_*/
