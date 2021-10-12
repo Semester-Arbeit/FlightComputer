@@ -15,8 +15,7 @@ class FlightPlaner
 
     FlightPlaner(Config* configurationData)
     {
-      this->keyFrameTimeStmps = configurationData->getFlightKeyFrames_ExecutionTime();
-      this->keyFrameAttitude = configurationData->getFlightKeyFrames_attitude();
+      
     }
 
     void start(unsigned long currentTime)
@@ -24,21 +23,7 @@ class FlightPlaner
       startTime = currentTime;
     }
 
-    void updateCurrentFlightParameters(unsigned long currentTime)
-    {
-      int indexOfCurrentFlightParameter = 0;
-      while (keyFrameTimeStmps[indexOfCurrentFlightParameter] < (currentTime-startTime))
-      {
-        indexOfCurrentFlightParameter++;
-      }
-      indexOfCurrentFlightParameter--;
-      currentFlightParameters = keyFrameAttitude[indexOfCurrentFlightParameter];
-    }
-
-    double * getTargetValues()
-    {
-      return currentFlightParameters;
-    }
+   
 
 
 

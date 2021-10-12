@@ -41,7 +41,7 @@ int status = WL_IDLE_STATUS;
 
 unsigned int localPort = 2390;      // local port to listen on
 
-char packetBuffer[255]; //buffer to hold incoming packet
+char packetBuffer[350]; //buffer to hold incoming packet
 char  ReplyBuffer[200];       // a string to send back
 char  Terminator[] = "E";       // a string to send back
 
@@ -57,29 +57,8 @@ void setup() {
   digitalWrite(LEDG, HIGH);
   digitalWrite(LEDB, HIGH);
 
-  //Initalise Flight Controls
-  blinkTaskLED(1);
-  Serial.println("Init Flight Controls");
-  flightSystem.testAilerons();
-  digitalWrite(LEDG, LOW);
-  Serial.println("Flight Controls Status: Okey");
-  delay(500);
-
-  //Initalise Sensors
-  blinkTaskLED(2);
-  Serial.println("Init Sensors");
-  if (flightSensors.init())
-  {
-    Serial.println("Sensors Status: Okey");
-    digitalWrite(LEDG, LOW);
-  }
-  else
-  {
-    Serial.println("Sensors Status: Failed");
-    digitalWrite(LEDR, LOW);
-  }
   //Initalise WIFI
-  blinkTaskLED(3);
+  blinkTaskLED(1);
   Serial.println("Init WiFi");
   status = WiFi.beginAP(ssid, pass);
   Udp.begin(localPort);
@@ -119,7 +98,7 @@ void setup() {
     }
     newKValues[m] = currentNumber.toDouble();
     Serial.println("---Parsed Data---");
-    for(int i = 0; i < 9; i++)
+    for (int i = 0; i < 9; i++)
     {
       Serial.print(i);
       Serial.print(":   ");
@@ -133,6 +112,76 @@ void setup() {
     Serial.println("Warning:  Not the correct UPD Commend Received!!");
     Serial.println("          Using default Values vor K");
   }
+
+  //KeyFrameConfiguration
+  while (!getNewUDPPackets())
+  {
+    digitalWrite(LEDG, LOW);
+    delay(100);
+    digitalWrite(LEDG, HIGH);
+    delay(100);
+  }
+  if ( packetBuffer[0] == 'F')
+  {
+    int i = 0;
+    String currentNumber = "";
+    for ( int m = 0; m < 100; m++)
+    {
+      digitalWrite(LEDG, HIGH);
+      while (!getNewUDPPackets())
+      {
+      }
+      digitalWrite(LEDG, LOW);
+      while (packetBuffer[i] != '\n')
+      {
+        if (packetBuffer[i] == ',')
+        {
+          configurationData.setNextKeyFrame(currentNumber.toDouble());
+          currentNumber = "";
+        }
+        else
+        {
+          currentNumber += packetBuffer[i];
+        }
+        i++;
+      }
+
+      i = 0;
+      configurationData.setNextKeyFrame(currentNumber.toDouble());
+    }
+
+
+    Serial.println("Flight Parameters Updated");
+    Serial.println("FileDumpCompleted");
+  }
+  else
+  {
+    Serial.println("Warning:  Not the correct UPD Commend Received!!");
+  }
+
+  //Initalise Flight Controls
+  blinkTaskLED(2);
+  Serial.println("Init Flight Controls");
+  flightSystem.testAilerons();
+  digitalWrite(LEDG, LOW);
+  Serial.println("Flight Controls Status: Okey");
+  delay(500);
+
+  //Initalise Sensors
+  blinkTaskLED(3);
+  Serial.println("Init Sensors");
+  if (flightSensors.init())
+  {
+    Serial.println("Sensors Status: Okey");
+    digitalWrite(LEDG, LOW);
+  }
+  else
+  {
+    Serial.println("Sensors Status: Failed");
+    digitalWrite(LEDR, LOW);
+  }
+
+
 
   //Initalise Flight Data Logger
   blinkTaskLED(4);
@@ -199,7 +248,7 @@ bool getNewUDPPackets()
   int packetSize = Udp.parsePacket();
   if (packetSize != 0)
   {
-    int len = Udp.read(packetBuffer, 255);
+    int len = Udp.read(packetBuffer, 350);
     if (len > 0) packetBuffer[len] = '\n';
     return true;
   }

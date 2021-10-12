@@ -35,15 +35,6 @@ class Config
       return KValuesForController;
     }
 
-    unsigned long* getFlightKeyFrames_ExecutionTime()
-    {
-      return FlightKeyFrames_ExecutionTime;
-    }
-
-    double** getFlightKeyFrames_attitude()
-    {
-      return FlightKeyFrames_attitude;
-    }
 
     bool setControlSystemValues(double* arrayOfValues)
     {
@@ -58,6 +49,30 @@ class Config
       yawK[1] = arrayOfValues[7];
       yawK[2] = arrayOfValues[8];
       return true;
+    }
+
+    bool setNextKeyFrame(double altitudeValue)
+    {
+      if(numberOfKeyFrames != indexInKeyFrameArray)
+      {
+        altitude[indexInKeyFrameArray] = altitudeValue;
+        indexInKeyFrameArray++;
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+
+    double* getAllKeyFrames()
+    {
+      return altitude;
+    }
+
+    int getNumberOfKeyFrames()
+    {
+      return numberOfKeyFrames;
     }
 
 
@@ -77,17 +92,19 @@ class Config
     double* KValuesForController[3] = {pitchK, rollK, yawK};
 
     //FlightParameters:
-    const int numberOfKeyframes = 10;
+    enum FlightParams{
+      numberOfKeyFrames = 5000
+    };
 
+    int indexInKeyFrameArray = 0;
 
+    double altitude[numberOfKeyFrames];
+    
     //Wifi Settings:
 
 
     //LoggingSettings:
 
-    unsigned long FlightKeyFrames_ExecutionTime[10];
-    double* FlightKeyFrames_attitude[10];
-    double FlightKeyFrames_altitude[10];
 
 };
 

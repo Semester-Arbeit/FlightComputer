@@ -30,6 +30,7 @@ class DataLogger
       if (err == 0)
       {
         return true;
+        isMounted = true;
       }
       else
       {
@@ -39,19 +40,28 @@ class DataLogger
 
     void open(String fileName)
     {
-      String("fs/LogFiles/" + fileName).toCharArray(this->fileName, 100);
-      fp = fopen(this->fileName, "w");
+      if (isMounted)
+      {
+        String("fs/LogFiles/" + fileName).toCharArray(this->fileName, 100);
+        fp = fopen(this->fileName, "w");
+      }
     }
 
     void println(String line)
     {
-      String(line + "\r\n").toCharArray(this->lineInFile, 100);
-      fprintf(fp, this->lineInFile);
+      if (isMounted)
+      {
+        String(line + "\r\n").toCharArray(this->lineInFile, 100);
+        fprintf(fp, this->lineInFile);
+      }
     }
 
     void close()
     {
-      fclose(fp);
+      if (isMounted)
+      {
+        fclose(fp);
+      }
     }
 
 
@@ -62,6 +72,7 @@ class DataLogger
     char lineInFile[100];
     SDMMCBlockDevice block_device;
     mbed::FATFileSystem fs;
+    bool isMounted = false;
 };
 
 #endif /*DATALOGGER_H_*/
