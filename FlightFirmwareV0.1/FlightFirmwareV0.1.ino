@@ -10,9 +10,6 @@
 #include "FlightPlaner.h"
 #include "DataLogger.h"
 
-
-
-
 Config configurationData = Config();
 FlightControls flightSystem = FlightControls(&configurationData);
 Sensors flightSensors = Sensors();
@@ -31,11 +28,24 @@ double tragetPitch = 0;
 double targetRoll = 0;
 double targetYaw = 0;
 
-ControlSystem flightControlSystem = ControlSystem(configurationData.getKValuesForController(), &sensPitch, &sensRoll, &sensYaw, &correctionPitch, &correctionRoll, &correctionYaw, &tragetPitch, &targetRoll, &targetYaw);
+ControlSystem flightControlSystem;
 
-DataLogger flightDataLogger = DataLogger("FlightLog.csv");
+DataLogger flightDataLogger;
 
+//UDP Connection
+char ssid[] = "Alpha";    // SSID
+char pass[] = "00000000";    // Pasword
+int keyIndex = 0;             // your network key Index number (needed only for WEP)
 
+int status = WL_IDLE_STATUS;
+
+unsigned int localPort = 2390;      // local port to listen on
+
+char packetBuffer[255]; //buffer to hold incoming packet
+char  ReplyBuffer[200];       // a string to send back
+char  Terminator[] = "E";       // a string to send back
+
+WiFiUDP Udp;
 
 
 void setup() {
@@ -49,77 +59,154 @@ void setup() {
 
   //Initalise Flight Controls
   blinkTaskLED(1);
-
+  Serial.println("Init Flight Controls");
   flightSystem.testAilerons();
   digitalWrite(LEDG, LOW);
+  Serial.println("Flight Controls Status: Okey");
   delay(500);
 
   //Initalise Sensors
   blinkTaskLED(2);
+  Serial.println("Init Sensors");
   if (flightSensors.init())
   {
+    Serial.println("Sensors Status: Okey");
     digitalWrite(LEDG, LOW);
   }
   else
   {
+    Serial.println("Sensors Status: Failed");
     digitalWrite(LEDR, LOW);
   }
-  //Initalise Control System
+  //Initalise WIFI
   blinkTaskLED(3);
+  Serial.println("Init WiFi");
+  status = WiFi.beginAP(ssid, pass);
+  Udp.begin(localPort);
+  Serial.println("WiFi Status: Okey");
+  delay(500);
+  while (!getNewUDPPackets())
+  {
+    digitalWrite(LEDG, LOW);
+    delay(250);
+    digitalWrite(LEDG, HIGH);
+    delay(250);
+  }
+  double newKValues[9];
+  if ( packetBuffer[0] == 'P')
+  {
+    while (!getNewUDPPackets())
+    {
+      delay(1);
+    }
+
+    int i = 0;
+    int m = 0;
+    String currentNumber = "";
+    while (packetBuffer[i] != '\n')
+    {
+      if (packetBuffer[i] == ',')
+      {
+        newKValues[m] = currentNumber.toDouble();
+        currentNumber = "";
+        m++;
+      }
+      else
+      {
+        currentNumber += packetBuffer[i];
+      }
+      i++;
+    }
+    newKValues[m] = currentNumber.toDouble();
+    Serial.println("---Parsed Data---");
+    for(int i = 0; i < 9; i++)
+    {
+      Serial.print(i);
+      Serial.print(":   ");
+      Serial.println(newKValues[i]);
+    }
+    configurationData.setControlSystemValues(newKValues);
+    Serial.println("PID Configuration Updated");
+  }
+  else
+  {
+    Serial.println("Warning:  Not the correct UPD Commend Received!!");
+    Serial.println("          Using default Values vor K");
+  }
+
+  //Initalise Flight Data Logger
+  blinkTaskLED(4);
+  Serial.println("Init Flight Data Logger");
+  if (flightDataLogger.init())
+  {
+    Serial.println("Flight Data Logger Status: Okey");
+    digitalWrite(LEDG, LOW);
+  }
+  else
+  {
+    Serial.println("Flight Data Logger Status: False");
+    digitalWrite(LEDR, LOW);
+  }
+  flightDataLogger.open("FlightLog.csv");
+  flightDataLogger.println("Time,sensPitch,sensRoll,sensYaw,correctionPitch,correctionRoll,correctionYaw");
+  delay(500);
+
+  //Initalise Control System
+  blinkTaskLED(5);
+  Serial.println("Init Control System");
+  flightControlSystem.init(configurationData.getKValuesForController(), &sensPitch, &sensRoll, &sensYaw, &correctionPitch, &correctionRoll, &correctionYaw, &tragetPitch, &targetRoll, &targetYaw);
+  Serial.println(flightControlSystem.getStatus());
   double* currentSensorData = flightSensors.getAttitude();
   sensPitch = currentSensorData[0];
   sensRoll = currentSensorData[1];
   sensYaw = currentSensorData[2];
   flightControlSystem.updateValues();
   flightSystem.setAilerons(correctionPitch, correctionRoll, correctionYaw);
-  delay(500);
-
-  //Initalise Flight Data Logger
-  blinkTaskLED(4);
-  if (flightDataLogger.init())
-  {
-    digitalWrite(LEDG, LOW);
-  }
-  else
-  {
-    digitalWrite(LEDR, LOW);
-  }
-  flightDataLogger.start("Time,sensPitch,sensRoll,sensYaw,correctionPitch,correctionRoll,correctionYaw");
-  delay(500);
-
-  //Initalise Wifi Network
-  blinkTaskLED(5);
-
-  delay(500);
-  flightSystem.startMotor();
-  delay(2500);
-  flightSystem.setThrotle(80);
-
-
-  for ( int i = 0; i < 20000; i++)
-  {
-    double* currentSensorData = flightSensors.getAttitude();
-    sensPitch = currentSensorData[0];
-    sensRoll = currentSensorData[1];
-    sensYaw = currentSensorData[2];
-    flightControlSystem.updateValues();
-    flightSystem.setAilerons(correctionPitch, correctionRoll, correctionYaw);
-    String currentTelemetryData = String(millis()) + ",";
-    currentTelemetryData += String(sensPitch) + ",";
-    currentTelemetryData += String(sensRoll) + ",";
-    currentTelemetryData += String(sensYaw) + ",";
-    currentTelemetryData += String(correctionPitch) + ",";
-    currentTelemetryData += String(correctionRoll) + ",";
-    currentTelemetryData += String(correctionYaw) +"\r\n";
-  }
-  flightDataLogger.end();
-  flightSystem.setThrotle(0);
-  flightSystem.stopMotor();
-  digitalWrite(LEDG, LOW);
 }
 
 void loop() {
 
+  if (getNewUDPPackets())
+  {
+    //Flight Mode
+    if (packetBuffer[0] == 'L')
+    {
+      digitalWrite(LEDR, LOW);
+      digitalWrite(LEDG, HIGH);
+      digitalWrite(LEDB, HIGH);
+    }
+
+    //Abort
+    if (packetBuffer[0] == 'A')
+    {
+      digitalWrite(LEDR, HIGH);
+      digitalWrite(LEDG, LOW);
+      digitalWrite(LEDB, HIGH);
+    }
+
+    //Configurate PID
+    if ( packetBuffer[0] == 'P')
+    {
+      digitalWrite(LEDR, HIGH);
+      digitalWrite(LEDG, HIGH);
+      digitalWrite(LEDB, LOW);
+    }
+  }
+}
+
+bool getNewUDPPackets()
+{
+  int packetSize = Udp.parsePacket();
+  if (packetSize != 0)
+  {
+    int len = Udp.read(packetBuffer, 255);
+    if (len > 0) packetBuffer[len] = '\n';
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 void blinkTaskLED(int blinks)
@@ -134,4 +221,11 @@ void blinkTaskLED(int blinks)
     digitalWrite(LEDB, HIGH);
     delay(250);
   }
+}
+
+void sendUdpData(char * dataToSend)
+{
+  Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+  Udp.write(dataToSend);
+  Udp.endPacket();
 }

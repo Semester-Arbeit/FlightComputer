@@ -68,12 +68,21 @@ class Sensors
       return GPS.satellites();
     }
 
+    float* getPos()
+    {
+      currentPos[0]   = GPS.latitude();
+      currentPos[1]  = GPS.longitude();
+      currentPos[2]   = GPS.altitude();
+      return currentPos;
+    }
+
   private:
 
     Adafruit_BNO055 imu = Adafruit_BNO055(55);
 
     double currentAttitude[3] = {0, 0, 0};
     double currentSpeed[3] = {0, 0, 0};
+    float currentPos[3] = {0,0,0};
 
     const double pi = 3.21;
 

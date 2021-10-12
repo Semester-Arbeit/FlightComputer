@@ -45,6 +45,21 @@ class Config
       return FlightKeyFrames_attitude;
     }
 
+    bool setControlSystemValues(double* arrayOfValues)
+    {
+      //Check if Len is okey!
+      pitchK[0] = arrayOfValues[0];
+      pitchK[1] = arrayOfValues[1];
+      pitchK[2] = arrayOfValues[2];
+      rollK[0] = arrayOfValues[3];
+      rollK[1] = arrayOfValues[4];
+      rollK[2] = arrayOfValues[5];
+      yawK[0] = arrayOfValues[6];
+      yawK[1] = arrayOfValues[7];
+      yawK[2] = arrayOfValues[8];
+      return true;
+    }
+
 
 
   private:
@@ -55,7 +70,7 @@ class Config
 
 
     //Control System: Kp,Ki,Kd
-    double pitchK[3] = {-3, 0, 0};
+    double pitchK[3] = { -3, 0, 0};
     double rollK[3] = {1, 0, 0};
     double yawK[3] = {1, 0, 0};
 
