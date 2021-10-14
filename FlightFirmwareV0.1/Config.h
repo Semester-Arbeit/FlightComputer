@@ -84,10 +84,10 @@ class Config
     double servoOffset[4] = {defaultServoOffset + 2, defaultServoOffset + 2.5, defaultServoOffset + 8.5, defaultServoOffset + 10};
 
 
-    //Control System: Kp,Ki,Kd
-    double pitchK[3] = { -3, 0, 0};
-    double rollK[3] = {1, 0, 0};
-    double yawK[3] = {1, 0, 0};
+    //Control System: Kp,Ki
+    double pitchK[2] = { 0, 0};
+    double rollK[2] = {0, 0};
+    double yawK[2] = {0, 0};
 
     double* KValuesForController[3] = {pitchK, rollK, yawK};
 

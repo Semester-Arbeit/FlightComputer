@@ -7,7 +7,7 @@
 //The Class to handle the data logging
 //---------------------------------------------------------------------------
 //Version: V0.1
-//Autor: Tobias Rothlin
+//Author: Tobias Rothlin
 //---------------------------------------------------------------------------
 //Methods:
 //

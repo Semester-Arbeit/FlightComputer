@@ -4,7 +4,7 @@
 //The Class to handle the current flight state
 //---------------------------------------------------------------------------
 //Version: V0.1
-//Autor: Tobias Rothlin
+//Author: Tobias Rothlin
 //---------------------------------------------------------------------------
 //Methods:
 //

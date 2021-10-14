@@ -3,10 +3,10 @@
 
 
 
-//The Class very simple P Controler
+//The Class implements a very simple P Controler
 //---------------------------------------------------------------------------
 //Version: V0.1
-//Autor: Tobias Rothlin
+//Author: Tobias Rothlin
 //---------------------------------------------------------------------------
 //Methods:
 //            
@@ -19,7 +19,7 @@ class P
     {
 
     }
-    void init(double* output, double* sensor, double target, double Kp)
+    void init(double* output, double* sensor, double* target, double* Kp)
     {
       this -> Kp = Kp;
       this -> outputValue = output;
@@ -29,13 +29,18 @@ class P
 
     void updateValues()
     {
-      *outputValue = (*targetValue - *sensorValue) * Kp;
+      *outputValue = (*targetValue - *sensorValue) * *Kp;
     }
 
 
+    String getStatus()
+    {
+      String status = "K = " + String(*Kp) + "\n";
+      return status;
+    }
 
   private:
-    double Kp;
+    double * Kp;
     double * outputValue;
     double * sensorValue;
     double * targetValue;

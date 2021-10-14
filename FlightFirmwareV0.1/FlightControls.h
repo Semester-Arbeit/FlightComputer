@@ -9,7 +9,7 @@
 //The Class to interface between the Firmware and Hardware FLight Controls.
 //---------------------------------------------------------------------------
 //Version: V0.1
-//Autor: Tobias Rothlin
+//Author: Tobias Rothlin
 //---------------------------------------------------------------------------
 //Methods:
 //            FlightControls() -> Constructor initalises the 5 PWM signals and sets the start values: ESC -> 0

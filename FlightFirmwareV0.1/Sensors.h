@@ -14,7 +14,7 @@
 //The Class to interface between the Firmware and the IMU/GPS.
 //---------------------------------------------------------------------------
 //Version: V0.1
-//Autor: Tobias Rothlin
+//Author: Tobias Rothlin
 //---------------------------------------------------------------------------
 //Methods:
 //            Sensors() -> Constructor Does nothing.

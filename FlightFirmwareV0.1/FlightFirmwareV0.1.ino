@@ -225,9 +225,6 @@ void loop() {
     //Flight Mode
     if (packetBuffer[0] == 'L')
     {
-      digitalWrite(LEDR, LOW);
-      digitalWrite(LEDG, HIGH);
-      digitalWrite(LEDB, HIGH);
       unsigned long lastExecutionTime = millis();
       for(int i = 0; i < 5000; i++)
       {
