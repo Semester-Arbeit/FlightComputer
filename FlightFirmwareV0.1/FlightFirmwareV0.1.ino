@@ -14,17 +14,12 @@ FlightControls flightSystem = FlightControls(&configurationData);
 Sensors flightSensors = Sensors();
 
 
-double sensPitch = 0;
-double sensRoll = 0;
-double sensYaw = 0;
+double targetAtt[3] = {0,0,0};
+double targetGyro[3] ={0,0,0};
+double targetPos[3] ={0,0,0};
+double targetSpeed[3] ={0,0,0};
 
-double correctionPitch = 0;
-double correctionRoll = 0;
-double correctionYaw = 0;
-
-double tragetPitch = 0;
-double targetRoll = 0;
-double targetYaw = 0;
+double outputPitch, outputRoll, outputYaw, outputPower;
 
 ControlSystem flightControlSystem;
 
@@ -209,7 +204,7 @@ void setup() {
   //Initalise Control System
   blinkTaskLED(5);
   Serial.println("Init Control System");
-  flightControlSystem.init(configurationData.getKValuesForController(), &sensPitch, &sensRoll, &sensYaw, &correctionPitch, &correctionRoll, &correctionYaw, &tragetPitch, &targetRoll, &targetYaw);
+  flightControlSystem.init(flightSensors.getAttitude(),flightSensors.getGyro(),flightSensors.getPos(),flightSensors.getSpeed(),targetAtt,targetGyro,targetPos,targetSpeed,&outputPitch,&outputRoll,&outputYaw,&outputPower,configurationData.getKValuesForController()[0],configurationData.getKValuesForController()[1],configurationData.getKValuesForController()[2],configurationData.getKValuesForController()[3]);
   Serial.println(flightControlSystem.getStatus());
   double* currentSensorData = flightSensors.getAttitude();
   sensPitch = currentSensorData[0];

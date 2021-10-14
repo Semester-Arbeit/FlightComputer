@@ -39,15 +39,22 @@ class Config
     bool setControlSystemValues(double* arrayOfValues)
     {
       //Check if Len is okey!
-      pitchK[0] = arrayOfValues[0];
-      pitchK[1] = arrayOfValues[1];
-      pitchK[2] = arrayOfValues[2];
-      rollK[0] = arrayOfValues[3];
-      rollK[1] = arrayOfValues[4];
-      rollK[2] = arrayOfValues[5];
-      yawK[0] = arrayOfValues[6];
-      yawK[1] = arrayOfValues[7];
-      yawK[2] = arrayOfValues[8];
+      kAtt[0] = arrayOfValues[0];
+      kAtt[1] = arrayOfValues[1];
+      kAtt[2] = arrayOfValues[2];
+      
+      kGyro[0] = arrayOfValues[3];
+      kGyro[1] = arrayOfValues[4];
+      kGyro[2] = arrayOfValues[5];
+      
+      kPos[0] = arrayOfValues[6];
+      kPos[1] = arrayOfValues[7];
+      kPos[2] = arrayOfValues[8];
+
+      kSpeed[0] = arrayOfValues[9];
+      kSpeed[1] = arrayOfValues[10];
+      kSpeed[2] = arrayOfValues[11];
+      
       return true;
     }
 
@@ -85,12 +92,13 @@ class Config
 
 
     //Control System: Kp,Ki
-    double pitchK[2] = { 0, 0};
-    double rollK[2] = {0, 0};
-    double yawK[2] = {0, 0};
+    double kAtt[3] ={0,0,0};
+    double kGyro[3] ={0,0,0};
+    double kPos[3] ={0,0,0};
+    double kSpeed[3] = {0,0,0};
 
-    double* KValuesForController[3] = {pitchK, rollK, yawK};
-
+    double* KValuesForController[4] = {kAtt,kGyro,kPos,kSpeed};
+     
     //FlightParameters:
     enum FlightParams{
       numberOfKeyFrames = 5000

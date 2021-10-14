@@ -1,7 +1,7 @@
 #ifndef CONTROLSYSTEM_H_
 #define CONTROLSYSTEM_H_
 
-#include "P.h"
+#include "PController.h"
 
 //The Class to handle all configuration Parameters
 //---------------------------------------------------------------------------
@@ -95,33 +95,34 @@ class ControlSystem
     }
 
   private:
-    P pPitch = P();
-    P pGyroX = P();
+    PController pPitch;
+    PController pGyroX;
     double pOutPitch = 0;
     double pOutGyroX = 0;
 
-    P pRoll = P();
-    P pGyroY = P();
+    PController pRoll;
+    PController pGyroY;
     double pOutRoll = 0;
     double pOutGyroY = 0;
 
-    P pYaw = P();
-    P pGyroZ = P();
+    PController pYaw;
+    PController pGyroZ;
     double pOutYaw = 0;
     double pOutGyroZ = 0;
 
-    P pPosX = P();
-    P pSpeedX = P();
+    PController pPosX;
+    PController pSpeedX;
     double pOutPosX = 0;
     double pOutSpeedX = 0;
 
-    P pPosY = P();
-    P pSpeedY = P();
+    PController pPosY;
+    PController pSpeedY;
     double pOutPosY = 0;
     double pOutSpeedY = 0;
 
-    P pPosZ = P();
-    P pSpeedZ = P();
+    PController pPosZ;
+
+    PController pSpeedZ;
     double pOutPosZ = 0;
     double pOutSpeedZ = 0;
 

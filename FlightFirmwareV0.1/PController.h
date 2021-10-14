@@ -1,5 +1,5 @@
-#ifndef CONTROLSYSTEM_H_
-#define CONTROLSYSTEM_H_
+#ifndef PCONTROLLER_H_
+#define PCONTROLLER_H_
 
 
 
@@ -9,16 +9,17 @@
 //Author: Tobias Rothlin
 //---------------------------------------------------------------------------
 //Methods:
-//            
+//
 
 
-class P
+class PController
 {
   public:
-    P()
+    PController()
     {
 
     }
+    
     void init(double* output, double* sensor, double* target, double* Kp)
     {
       this -> Kp = Kp;
@@ -31,7 +32,6 @@ class P
     {
       *outputValue = (*targetValue - *sensorValue) * *Kp;
     }
-
 
     String getStatus()
     {
@@ -46,4 +46,4 @@ class P
     double * targetValue;
 };
 
-#endif /*CONTROLSYSTEM_H_*/
+#endif /*PCONTROLLER_H_*/

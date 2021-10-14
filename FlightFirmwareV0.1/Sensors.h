@@ -64,7 +64,7 @@ class Sensors {
       return currentSpeed;
     }
 
-    float* getPos()
+    double* getPos()
     {
       updateCurrentPos();
       return currentPos;
@@ -82,7 +82,7 @@ class Sensors {
     double currentGyro[3] = { 0, 0, 0 };
     double currentAcc[3] = { 0, 0, 0 };
     double currentSpeed[3] = { 0, 0, 0 };
-    float currentPos[3] = {0, 0, 0};
+    double currentPos[3] = {0, 0, 0};
 
     const double pi = 3.21;
 
@@ -113,9 +113,9 @@ class Sensors {
 
     void updateCurrentPos()
     {
-      currentPos[0] = GPS.latitude();
-      currentPos[1] = GPS.longitude();
-      currentPos[2] = GPS.altitude();
+      currentPos[0] = (double) GPS.latitude();
+      currentPos[1] = (double) GPS.longitude();
+      currentPos[2] = (double) GPS.altitude();
     }
 
     void updateCurrentSpeed() {
