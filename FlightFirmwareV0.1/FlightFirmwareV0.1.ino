@@ -57,8 +57,23 @@ void setup() {
   digitalWrite(LEDG, HIGH);
   digitalWrite(LEDB, HIGH);
 
-  //Initalise WIFI
+  //Initalise Sensors
   blinkTaskLED(1);
+  Serial.println("Init Sensors");
+  if (flightSensors.init())
+  {
+    Serial.println("Sensors Status: Okey");
+    digitalWrite(LEDG, LOW);
+  }
+  else
+  {
+    Serial.println("Sensors Status: Failed");
+    digitalWrite(LEDR, LOW);
+  }
+
+
+  //Initalise WIFI
+  blinkTaskLED(2);
   Serial.println("Init WiFi");
   status = WiFi.beginAP(ssid, pass);
   Udp.begin(localPort);
@@ -97,14 +112,22 @@ void setup() {
       i++;
     }
     newKValues[m] = currentNumber.toDouble();
-    Serial.println("---Parsed Data---");
-    for (int i = 0; i < 9; i++)
-    {
-      Serial.print(i);
-      Serial.print(":   ");
-      Serial.println(newKValues[i]);
-    }
     configurationData.setControlSystemValues(newKValues);
+    double** data = configurationData.getKValuesForController();
+    Serial.println("---Parsed Data---");
+    for (int i = 0; i < 3; i++)
+    {
+      for (int m = 0; m < 3; m++)
+      {
+        Serial.print(i);
+        Serial.print(",");
+        Serial.print(m);
+        Serial.print(":   ");
+        Serial.println(data[i][m]);
+      }
+
+    }
+
     Serial.println("PID Configuration Updated");
   }
   else
@@ -160,28 +183,12 @@ void setup() {
   }
 
   //Initalise Flight Controls
-  blinkTaskLED(2);
+  blinkTaskLED(3);
   Serial.println("Init Flight Controls");
   flightSystem.testAilerons();
   digitalWrite(LEDG, LOW);
   Serial.println("Flight Controls Status: Okey");
   delay(500);
-
-  //Initalise Sensors
-  blinkTaskLED(3);
-  Serial.println("Init Sensors");
-  if (flightSensors.init())
-  {
-    Serial.println("Sensors Status: Okey");
-    digitalWrite(LEDG, LOW);
-  }
-  else
-  {
-    Serial.println("Sensors Status: Failed");
-    digitalWrite(LEDR, LOW);
-  }
-
-
 
   //Initalise Flight Data Logger
   blinkTaskLED(4);
