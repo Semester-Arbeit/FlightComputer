@@ -31,6 +31,7 @@ double targetYaw = 0;
 ControlSystem flightControlSystem;
 
 DataLogger flightDataLogger;
+DataLogger flightErrorLog;
 
 //UDP Connection
 char ssid[] = "Alpha";    // SSID
@@ -204,7 +205,7 @@ void setup() {
     digitalWrite(LEDR, LOW);
   }
   flightDataLogger.open("FlightLog.csv");
-  flightDataLogger.println("Time,sensPitch,sensRoll,sensYaw,correctionPitch,correctionRoll,correctionYaw");
+  flightDataLogger.println("Time,sensPitch,sensRoll,sensYaw,xGyro,yGyro,ZGyro,xAcc,yAcc,zAcc,correctionPitch,correctionRoll,correctionYaw");
   delay(500);
 
   //Initalise Control System
