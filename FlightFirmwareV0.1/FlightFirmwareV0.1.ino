@@ -7,14 +7,12 @@
 #include "Sensors.h"
 #include "Config.h"
 #include "ControlSystem.h"
-#include "FlightPlaner.h"
 #include "DataLogger.h"
 
 Config configurationData = Config();
 FlightControls flightSystem = FlightControls(&configurationData);
 Sensors flightSensors = Sensors();
 
-FlightPlaner planer = FlightPlaner(&configurationData);
 
 double sensPitch = 0;
 double sensRoll = 0;
@@ -222,7 +220,6 @@ void setup() {
 }
 
 void loop() {
-
   if (getNewUDPPackets())
   {
     //Flight Mode
@@ -231,22 +228,23 @@ void loop() {
       digitalWrite(LEDR, LOW);
       digitalWrite(LEDG, HIGH);
       digitalWrite(LEDB, HIGH);
-    }
-
-    //Abort
-    if (packetBuffer[0] == 'A')
-    {
-      digitalWrite(LEDR, HIGH);
-      digitalWrite(LEDG, LOW);
-      digitalWrite(LEDB, HIGH);
-    }
-
-    //Configurate PID
-    if ( packetBuffer[0] == 'P')
-    {
-      digitalWrite(LEDR, HIGH);
-      digitalWrite(LEDG, HIGH);
-      digitalWrite(LEDB, LOW);
+      unsigned long lastExecutionTime = millis();
+      for(int i = 0; i < 5000; i++)
+      {
+        while(millis()-lastExecutionTime < 10)
+        {
+        }
+        lastExecutionTime = millis();
+        if(getNewUDPPackets())
+        {
+          if(packetBuffer[0] == 'A')
+          {
+            break;
+          }
+        }
+        //DoFlightStuff
+        Serial.println(millis());
+      }
     }
   }
 }
