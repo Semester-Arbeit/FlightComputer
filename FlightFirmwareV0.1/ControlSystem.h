@@ -22,23 +22,23 @@ class ControlSystem
 
     }
     
-    void init(double** attitude, double** gyro, double** position, double** speed, double** targetAttitude, double** targetGyro, double** targetPosition, double** targetSpeed, double* outputPitch, double* outputRoll, double* outputYaw, double* outputPower, double** kAtt, double** kGyro, double** kPos, double** kSpeed)
+    void init(double* attitude, double* gyro, double* position, double* speed, double* targetAttitude, double* targetGyro, double* targetPosition, double* targetSpeed, double* outputPitch, double* outputRoll, double* outputYaw, double* outputPower, double* kAtt, double* kGyro, double* kPos, double* kSpeed)
     {
-      pPitch.init(&pOutPitch, attitude[0], targetAttitude[0], kAtt[0]);
-      pRoll.init(&pOutRoll, attitude[1], targetAttitude[1], kAtt[1]);
-      pYaw.init(&pOutYaw, attitude[2], targetAttitude[2], kAtt[2]);
+      pPitch.init(&pOutPitch, &attitude[0], &targetAttitude[0], &kAtt[0]);
+      pRoll.init(&pOutRoll, &attitude[1], &targetAttitude[1], &kAtt[1]);
+      pYaw.init(&pOutYaw, &attitude[2], &targetAttitude[2], &kAtt[2]);
 
-      pGyroX.init(&pOutGyroX, gyro[0], targetGyro[0], kGyro[0]);
-      pGyroY.init(&pOutGyroY, gyro[1], targetGyro[1], kGyro[1]);
-      pGyroZ.init(&pOutGyroZ, gyro[2], targetGyro[2], kGyro[2]);
+      pGyroX.init(&pOutGyroX, &gyro[0], &targetGyro[0], &kGyro[0]);
+      pGyroY.init(&pOutGyroY, &gyro[1], &targetGyro[1], &kGyro[1]);
+      pGyroZ.init(&pOutGyroZ, &gyro[2], &targetGyro[2], &kGyro[2]);
 
-      pPosX.init(&pOutPosX, position[0], targetPosition[0], kPos[0]);
-      pPosY.init(&pOutPosY, position[1], targetPosition[1], kPos[1]);
-      pPosZ.init(&pOutPosZ, position[2], targetPosition[2], kPos[2]);
+      pPosX.init(&pOutPosX, &position[0], &targetPosition[0], &kPos[0]);
+      pPosY.init(&pOutPosY, &position[1], &targetPosition[1], &kPos[1]);
+      pPosZ.init(&pOutPosZ, &position[2], &targetPosition[2], &kPos[2]);
 
-      pSpeedX . init(&pOutSpeedX, speed[0], targetSpeed[0], kSpeed[0]);
-      pSpeedY . init(&pOutSpeedY, speed[1], targetSpeed[1], kSpeed[1]);
-      pSpeedZ . init(&pOutSpeedZ, speed[2], targetSpeed[2], kSpeed[2]);
+      pSpeedX.init(&pOutSpeedX, &speed[0], &targetSpeed[0], &kSpeed[0]);
+      pSpeedY.init(&pOutSpeedY, &speed[1], &targetSpeed[1], &kSpeed[1]);
+      pSpeedZ.init(&pOutSpeedZ, &speed[2], &targetSpeed[2], &kSpeed[2]);
 
       driverOutputPitch = outputPitch;
       driverOutputRoll = outputRoll;
