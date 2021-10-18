@@ -180,7 +180,7 @@ void setup() {
   flightDataLogger.println("Time,sensPitch,sensRoll,sensYaw,xGyro,yGyro,ZGyro,xAcc,yAcc,zAcc,correctionPitch,correctionRoll,correctionYaw");
   delay(500);
 
-  
+
 
   //Initalise Control System
   blinkTaskLED(5);
@@ -190,14 +190,22 @@ void setup() {
   flightSensors.getAttitude();
   flightControlSystem.updateValues();
   flightSystem.setAilerons(outputPitch, outputRoll, outputYaw);
+  digitalWrite(LEDR, HIGH);
+  digitalWrite(LEDG, LOW);
+  digitalWrite(LEDB, HIGH);
+  Serial.println("Init Done");
 }
 
 void loop() {
   if (getNewUDPPackets())
   {
     //Flight Mode
+    String telemetryString = "";
     if (packetBuffer[0] == 'L')
     {
+      digitalWrite(LEDR, LOW);
+      digitalWrite(LEDG, HIGH);
+      digitalWrite(LEDB, HIGH);
       unsigned long lastExecutionTime = millis();
       for (int i = 0; i < 5000; i++)
       {
@@ -209,12 +217,24 @@ void loop() {
         {
           if (packetBuffer[0] == 'A')
           {
+            flightDataLogger.close();
             break;
           }
         }
-        //DoFlightStuff
+        double * attitude = flightSensors.getAttitude();
+        telemetryString = String(millis()) + "," + String(attitude[0]) + "," + String(attitude[1]) + "," + String(attitude[2]);
+        telemetryString.toCharArray(ReplyBuffer, 200);
+        sendUdpData(ReplyBuffer);
+        flightDataLogger.println(telemetryString);
         Serial.println(millis());
       }
+      telemetryString = "E";
+      telemetryString.toCharArray(ReplyBuffer, 200);
+      sendUdpData(ReplyBuffer);
+      digitalWrite(LEDR, HIGH);
+      digitalWrite(LEDG, LOW);
+      digitalWrite(LEDB, HIGH);
+      flightDataLogger.close();
     }
 
     if (packetBuffer[0] == 'P')
@@ -261,11 +281,6 @@ void loop() {
 
       Serial.println("PID Configuration Updated");
       Serial.println(flightControlSystem.getStatus());
-    }
-    else
-    {
-      Serial.println("Warning:  Not the correct UPD Commend Received!!");
-      Serial.println("          Using default Values vor K");
     }
   }
 }

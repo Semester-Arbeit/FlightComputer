@@ -222,7 +222,7 @@ class FlightControls
     }
 
   private:
-    const double stallAngle = 45;
+    const double stallAngle = 30;
     const double squareStallAngle = stallAngle * stallAngle; //used to decide if the courrent Angle is greater than the stall angle.
 
     Config* configurationData = nullptr;
