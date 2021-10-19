@@ -21,46 +21,10 @@ void setup() {
 }
 
 void loop() {
+  flightControlSystem.startMotor();
 
-  if (Serial.available())
-  {
-    char c = Serial.read();
-    if ( c == '0')
-    {
-      i = 0;
-      Serial.println(i);
-    }
-    else if ( c == '1')
-    {
-      i = 1;
-      Serial.println(i);
-    }
-    else if ( c == '2')
-    {
-      i = 2;
-      Serial.println(i);
-    }
-    else if ( c == '3')
-    {
-      i = 3;
-      Serial.println(i);
-    }
-    else if ( c == '+')
-    {
-      double* offsets = flightControlSystem.setServoNullPos(i, 0.5);
-      Serial.print(i);
-      Serial.print(":     ");
-      Serial.println(offsets[i]);
-    }
-    else if ( c == '-')
-    {
-      double* offsets = flightControlSystem.setServoNullPos(i, -0.5);
-      Serial.print(i);
-      Serial.print(":     ");
-      Serial.println(offsets[i]);
-    }
 
-  }
+}
 }
 
 void blinkTaskLED(int blinks)

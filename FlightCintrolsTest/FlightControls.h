@@ -4,11 +4,12 @@
 #include <Servo.h>
 #include <mbed.h>
 #include <Arduino_PortentaBreakout.h>
+#include "Config.h"
 
 //The Class to interface between the Firmware and Hardware FLight Controls.
 //---------------------------------------------------------------------------
 //Version: V0.1
-//Autor: Tobias Rothlin
+//Author: Tobias Rothlin
 //---------------------------------------------------------------------------
 //Methods:
 //            FlightControls() -> Constructor initalises the 5 PWM signals and sets the start values: ESC -> 0
@@ -25,13 +26,14 @@
 class FlightControls
 {
   public:
-    FlightControls()
+    FlightControls(Config* configurationData)
     {
+      this->configurationData = configurationData;
       for (int i = 0; i < 4; i++)
       {
         servoFlightControls[i] = Servo();
         servoFlightControls[i].attach(servoPins[i]);
-        servoFlightControls[i].write(servoOffset[i]);
+        servoFlightControls[i].write(configurationData->getServoOffsets()[i]);
       }
       ESC.attach(MotorPin);
       MotorEnable.attach(MotorEnablePin);
@@ -43,13 +45,14 @@ class FlightControls
     {
       for (int i = 0; i < 4; i++)
       {
-        servoFlightControls[i].write(servoOffset[i] - 90);
+        servoFlightControls[i].write(configurationData->getServoOffsets()[i] - 90);
       }
       ESC.write(0);
     }
 
     void startMotor()
     {
+      setAilerons(0, 0, 0);
       MotorEnable.write(180);
       for ( int i = 0; i < 30; i++)
       {
@@ -61,6 +64,7 @@ class FlightControls
     void stopMotor()
     {
       MotorEnable.write(0);
+      enterTransportMode();
     }
 
     void setThrotle(double power)
@@ -160,10 +164,10 @@ class FlightControls
         }
       }
 
-      servoFlightControls[0].write(servoOffset[0] - rollXn);
-      servoFlightControls[1].write(servoOffset[1] - pitchYp);
-      servoFlightControls[2].write(servoOffset[2] - rollXp);
-      servoFlightControls[3].write(servoOffset[3] - pitchYn);
+      servoFlightControls[0].write(configurationData->getServoOffsets()[0] - rollXn);
+      servoFlightControls[1].write(configurationData->getServoOffsets()[1] - pitchYp);
+      servoFlightControls[2].write(configurationData->getServoOffsets()[2] - rollXp);
+      servoFlightControls[3].write(configurationData->getServoOffsets()[3] - pitchYn);
       return !maxReached;
     }
 
@@ -171,10 +175,10 @@ class FlightControls
     {
       if (escPower == 0 && ServoIndex < 4)
       {
-        servoOffset[ServoIndex] = servoOffset[ServoIndex] + changeValue;
-        servoFlightControls[ServoIndex].write(servoOffset[ServoIndex]);
+        configurationData->setServoOffset(ServoIndex, configurationData->getServoOffsets()[ServoIndex] + changeValue);
+        servoFlightControls[ServoIndex].write(configurationData->getServoOffsets()[ServoIndex]);
       }
-      return servoOffset;
+      return configurationData->getServoOffsets();
     }
 
     void restAilerons()
@@ -218,13 +222,11 @@ class FlightControls
     }
 
   private:
-
-    const double defaultServoOffset = 90;
-    double servoOffset[4] = {defaultServoOffset +2, defaultServoOffset+2.5, defaultServoOffset+ 8.5, defaultServoOffset + 2};
-
-    const double stallAngle = 45;
+    const double stallAngle = 30;
     const double squareStallAngle = stallAngle * stallAngle; //used to decide if the courrent Angle is greater than the stall angle.
 
+    Config* configurationData = nullptr;
+    
     double escPower = 0;
 
     breakoutPin MotorPin = PWM5;

@@ -39,8 +39,8 @@ print()
 KValuesNumberOfDataPoints = 12;
 printProgressBar(0, KValuesNumberOfDataPoints, prefix='Progress:',suffix='Complete', length=50)
 with open("KValues.csv", 'w') as file:
-    file.write("9"+f"{0:03}" + ".11")
+    file.write("1")
     for i in range(KValuesNumberOfDataPoints - 1):
-        file.write(","+"9" + f"{(i + 1):03}" + ".11")
+        file.write(","+"1")
         printProgressBar(i + 1, KValuesNumberOfDataPoints, prefix='Progress:',suffix='Complete', length=50)
     file.write("\n")

@@ -45,9 +45,12 @@ char  Terminator[] = "E";       // a string to send back
 
 WiFiUDP Udp;
 
+bool isSerialAvalable = false;
 
 void setup() {
   Serial.begin(9600);
+  delay(5000);
+  isSerialAvalable = Serial;
   pinMode(LEDR, OUTPUT);
   pinMode(LEDG, OUTPUT);
   pinMode(LEDB, OUTPUT);
@@ -66,7 +69,6 @@ void setup() {
     String currentNumber = "";
     while (c != '\n')
     {
-      Serial.print(c);
       if (c == ',')
       {
         newKValues[indexInNewKValues] = currentNumber.toDouble();
@@ -82,27 +84,17 @@ void setup() {
     fclose(fp);
     newKValues[indexInNewKValues] = currentNumber.toDouble();
     configurationData.setControlSystemValues(newKValues);
-    double** data = configurationData.getKValuesForController();
-    Serial.println("---Parsed Data---");
-    for (int i = 0; i < 3; i++)
+    if (isSerialAvalable)
     {
-      for (int m = 0; m < 3; m++)
-      {
-        Serial.print(i);
-        Serial.print(",");
-        Serial.print(m);
-        Serial.print(":   ");
-        Serial.println(data[i][m]);
-      }
+      Serial.println("PID Configuration Updated");
     }
-    Serial.println("PID Configuration Updated");
+
 
     fp = fopen("fs/ConfigFiles/AltitudeProfile.csv", "r");
     c = fgetc(fp);
     currentNumber = "";
     while (c != '\n')
     {
-      Serial.print(c);
       if (c == ',')
       {
         configurationData.setNextKeyFrame(currentNumber.toDouble());
@@ -116,64 +108,100 @@ void setup() {
     }
     fclose(fp);
     configurationData.setNextKeyFrame(currentNumber.toDouble());
-    Serial.println("---Parsed Data---");
-    double* altitudeData = configurationData.getAllKeyFrames();
-    for (int i = 0; i < configurationData.getNumberOfKeyFrames(); i++)
+    if (isSerialAvalable)
     {
-      Serial.print(i);
-      Serial.print(":   ");
-      Serial.println(altitudeData[i]);
+      Serial.println("---Parsed Data---");
+      double* altitudeData = configurationData.getAllKeyFrames();
+      for (int i = 0; i < configurationData.getNumberOfKeyFrames(); i++)
+      {
+        Serial.print(i);
+        Serial.print(":   ");
+        Serial.println(altitudeData[i]);
+      }
     }
   }
   else
-  {
-    Serial.println("Warning:  Not the correct UPD Commend Received!!");
-    Serial.println("          Using default Values vor K");
+  { if (isSerialAvalable)
+    {
+      Serial.println("Warning:  Not the correct UPD Commend Received!!");
+      Serial.println("          Using default Values vor K");
+    }
+
   }
 
 
   //Initalise Sensors
   blinkTaskLED(1);
-  Serial.println("Init Sensors");
+  if (isSerialAvalable)
+  {
+    Serial.println("Init Sensors");
+  }
   if (flightSensors.init())
   {
-    Serial.println("Sensors Status: Okey");
+    if (isSerialAvalable)
+    {
+      Serial.println("Sensors Status: Okey");
+    }
     digitalWrite(LEDG, LOW);
   }
   else
   {
-    Serial.println("Sensors Status: Failed");
+    if (isSerialAvalable)
+    {
+      Serial.println("Sensors Status: Failed");
+    }
     digitalWrite(LEDR, LOW);
   }
 
   //Initalise WIFI
   blinkTaskLED(2);
-  Serial.println("Init WiFi");
+  if (isSerialAvalable)
+  {
+    Serial.println("Init WiFi");
+  }
   status = WiFi.beginAP(ssid, pass);
   Udp.begin(localPort);
-  Serial.println("WiFi Status: Okey");
+  if (isSerialAvalable)
+  {
+    Serial.println("WiFi Status: Okey");
+  }
   delay(500);
 
 
   //Initalise Flight Controls
   blinkTaskLED(3);
-  Serial.println("Init Flight Controls");
+  if (isSerialAvalable)
+  {
+    Serial.println("Init Flight Controls");
+  }
   flightSystem.testAilerons();
   digitalWrite(LEDG, LOW);
-  Serial.println("Flight Controls Status: Okey");
+  if (isSerialAvalable)
+  {
+    Serial.println("Flight Controls Status: Okey");
+  }
   delay(500);
 
   //Initalise Flight Data Logger
   blinkTaskLED(4);
-  Serial.println("Init Flight Data Logger");
+  if (isSerialAvalable)
+  {
+    Serial.println("Init Flight Data Logger");
+  }
   if (flightDataLogger.init())
   {
-    Serial.println("Flight Data Logger Status: Okey");
+    if (isSerialAvalable)
+    {
+      Serial.println("Flight Data Logger Status: Okey");
+    }
     digitalWrite(LEDG, LOW);
   }
   else
   {
-    Serial.println("Flight Data Logger Status: False");
+    if (isSerialAvalable)
+    {
+      Serial.println("Flight Data Logger Status: False");
+    }
     digitalWrite(LEDR, LOW);
   }
   flightDataLogger.open("FlightLog.csv");
@@ -184,16 +212,25 @@ void setup() {
 
   //Initalise Control System
   blinkTaskLED(5);
-  Serial.println("Init Control System");
+  if (isSerialAvalable)
+  {
+    Serial.println("Init Control System");
+  }
   flightControlSystem.init(flightSensors.getAttitude(), flightSensors.getGyro(), flightSensors.getPos(), flightSensors.getSpeed(), targetAtt, targetGyro, targetPos, targetSpeed, &outputPitch, &outputRoll, &outputYaw, &outputPower, configurationData.getKValuesForController()[0], configurationData.getKValuesForController()[1], configurationData.getKValuesForController()[2], configurationData.getKValuesForController()[3]);
-  Serial.println(flightControlSystem.getStatus());
+  if (isSerialAvalable)
+  {
+    Serial.println(flightControlSystem.getStatus());
+  }
   flightSensors.getAttitude();
   flightControlSystem.updateValues();
   flightSystem.setAilerons(outputPitch, outputRoll, outputYaw);
   digitalWrite(LEDR, HIGH);
   digitalWrite(LEDG, LOW);
   digitalWrite(LEDB, HIGH);
-  Serial.println("Init Done");
+  if (isSerialAvalable)
+  {
+    Serial.println("Init Done");
+  }
 }
 
 void loop() {
@@ -206,6 +243,8 @@ void loop() {
       digitalWrite(LEDR, LOW);
       digitalWrite(LEDG, HIGH);
       digitalWrite(LEDB, HIGH);
+      flightSystem.startMotor();
+      delay(500);
       unsigned long lastExecutionTime = millis();
       for (int i = 0; i < 5000; i++)
       {
@@ -217,16 +256,33 @@ void loop() {
         {
           if (packetBuffer[0] == 'A')
           {
+            flightSystem.stopMotor();
             flightDataLogger.close();
             break;
           }
         }
         double * attitude = flightSensors.getAttitude();
-        telemetryString = String(millis()) + "," + String(attitude[0]) + "," + String(attitude[1]) + "," + String(attitude[2]);
+        double * gyro = flightSensors.getGyro();
+        double* acc = flightSensors.getAcc();
+        
+        flightControlSystem.updateValues();
+        
+        
+        
+        telemetryString = String(millis()) + "," + String(attitude[0]) + "," + String(attitude[1]) + "," + String(attitude[2]) + "," + String(gyro[0]) + "," + String(gyro[1]) + "," + String(gyro[2]) + "," + String(acc[0]) + "," + String(acc[1]) + "," + String(acc[2]) + "," + String(outputPitch) + "," + String(outputRoll) + "," + String(outputYaw);
         telemetryString.toCharArray(ReplyBuffer, 200);
         sendUdpData(ReplyBuffer);
+        Serial.println("----------");
+        Serial.println(millis());
         flightDataLogger.println(telemetryString);
         Serial.println(millis());
+        flightSystem.setAilerons(outputPitch, outputRoll, outputYaw);
+        flightSystem.setThrotle(outputPower);
+        
+        if (isSerialAvalable)
+        {
+          Serial.println(telemetryString);
+        }
       }
       telemetryString = "E";
       telemetryString.toCharArray(ReplyBuffer, 200);
@@ -234,6 +290,7 @@ void loop() {
       digitalWrite(LEDR, HIGH);
       digitalWrite(LEDG, LOW);
       digitalWrite(LEDB, HIGH);
+      flightSystem.stopMotor();
       flightDataLogger.close();
     }
 
@@ -264,23 +321,10 @@ void loop() {
       }
       newKValues[m] = currentNumber.toDouble();
       configurationData.setControlSystemValues(newKValues);
-      double** data = configurationData.getKValuesForController();
-      Serial.println("---Parsed Data---");
-      for (int i = 0; i < 3; i++)
+      if (isSerialAvalable)
       {
-        for (int m = 0; m < 3; m++)
-        {
-          Serial.print(i);
-          Serial.print(",");
-          Serial.print(m);
-          Serial.print(":   ");
-          Serial.println(data[i][m]);
-        }
-
+        Serial.println(flightControlSystem.getStatus());
       }
-
-      Serial.println("PID Configuration Updated");
-      Serial.println(flightControlSystem.getStatus());
     }
   }
 }
