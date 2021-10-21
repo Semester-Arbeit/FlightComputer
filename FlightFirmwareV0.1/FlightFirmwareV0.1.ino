@@ -108,6 +108,7 @@ void setup() {
     }
     fclose(fp);
     configurationData.setNextKeyFrame(currentNumber.toDouble());
+    
     if (isSerialAvalable)
     {
       Serial.println("---Parsed Data---");
@@ -128,10 +129,23 @@ void setup() {
     }
 
   }
-
+  
+  //Initalise WIFI
+  blinkTaskLED(1);
+  if (isSerialAvalable)
+  {
+    Serial.println("Init WiFi");
+  }
+  status = WiFi.beginAP(ssid, pass);
+  Udp.begin(localPort);
+  if (isSerialAvalable)
+  {
+    Serial.println("WiFi Status: Okey");
+  }
+  delay(500);
 
   //Initalise Sensors
-  blinkTaskLED(1);
+  blinkTaskLED(2);
   if (isSerialAvalable)
   {
     Serial.println("Init Sensors");
@@ -153,19 +167,7 @@ void setup() {
     digitalWrite(LEDR, LOW);
   }
 
-  //Initalise WIFI
-  blinkTaskLED(2);
-  if (isSerialAvalable)
-  {
-    Serial.println("Init WiFi");
-  }
-  status = WiFi.beginAP(ssid, pass);
-  Udp.begin(localPort);
-  if (isSerialAvalable)
-  {
-    Serial.println("WiFi Status: Okey");
-  }
-  delay(500);
+
 
 
   //Initalise Flight Controls
@@ -205,7 +207,7 @@ void setup() {
     digitalWrite(LEDR, LOW);
   }
   flightDataLogger.open("FlightLog.csv");
-  flightDataLogger.println("Time,sensPitch,sensRoll,sensYaw,xGyro,yGyro,ZGyro,xAcc,yAcc,zAcc,correctionPitch,correctionRoll,correctionYaw");
+  flightDataLogger.println("Time,sensPitch,sensRoll,sensYaw,xGyro,yGyro,ZGyro,xAcc,yAcc,zAcc,latitude,longitude,alt,Sat,correctionPitch,correctionRoll,correctionYaw");
   delay(500);
 
 
@@ -264,21 +266,17 @@ void loop() {
         double * attitude = flightSensors.getAttitude();
         double * gyro = flightSensors.getGyro();
         double* acc = flightSensors.getAcc();
-        
+        double* pos = flightSensors.getPos();
+
         flightControlSystem.updateValues();
-        
-        
-        
-        telemetryString = String(millis()) + "," + String(attitude[0]) + "," + String(attitude[1]) + "," + String(attitude[2]) + "," + String(gyro[0]) + "," + String(gyro[1]) + "," + String(gyro[2]) + "," + String(acc[0]) + "," + String(acc[1]) + "," + String(acc[2]) + "," + String(outputPitch) + "," + String(outputRoll) + "," + String(outputYaw);
+
+        telemetryString = String(millis()) + "," + String(attitude[0]) + "," + String(attitude[1]) + "," + String(attitude[2]) + "," + String(gyro[0]) + "," + String(gyro[1]) + "," + String(gyro[2]) + "," + String(acc[0]) + "," + String(acc[1]) + "," + String(acc[2]) + "," + String(pos[0]) + "," + String(pos[1]) + "," + String(pos[2]) + "," + String(flightSensors.getNumberOfSatellites()) + "," + String(outputPitch) + "," + String(outputRoll) + "," + String(outputYaw);
         telemetryString.toCharArray(ReplyBuffer, 200);
         sendUdpData(ReplyBuffer);
-        Serial.println("----------");
-        Serial.println(millis());
         flightDataLogger.println(telemetryString);
-        Serial.println(millis());
         flightSystem.setAilerons(outputPitch, outputRoll, outputYaw);
         flightSystem.setThrotle(outputPower);
-        
+
         if (isSerialAvalable)
         {
           Serial.println(telemetryString);
@@ -321,10 +319,6 @@ void loop() {
       }
       newKValues[m] = currentNumber.toDouble();
       configurationData.setControlSystemValues(newKValues);
-      if (isSerialAvalable)
-      {
-        Serial.println(flightControlSystem.getStatus());
-      }
     }
   }
 }

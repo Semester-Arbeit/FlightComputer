@@ -6,9 +6,10 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
-#include <Arduino_MKRGPS.h>
 #include <mbed.h>
 #include <Arduino_PortentaBreakout.h>
+#include "LaserRangeFinder.h"
+#include <Arduino_MKRGPS.h>
 
 
 //The Class to interface between the Firmware and the IMU/GPS.
@@ -32,12 +33,7 @@ class Sensors {
     }
 
     bool init() {
-      if (imu.begin() && GPS.begin()) {
-        updateAttitudeData();
-        //        while (GPS.satellites() < 3) //Waitting to connect to at leaast 3 Sat
-        //        {
-        //          delay(200);
-        //        }
+      if (imu.begin() && altitudeLaser.init()) {
         return true;
       } else {
         return false;
@@ -72,11 +68,13 @@ class Sensors {
 
 
     int getNumberOfSatellites() {
-      return GPS.satellites();
+      return 0;//GPS.satellites();
     }
 
   private:
     Adafruit_BNO055 imu = Adafruit_BNO055(55);
+    LaserRangeFinder altitudeLaser = LaserRangeFinder();
+
 
     double currentAttitude[3] = { 0, 0, 0 };
     double currentGyro[3] = { 0, 0, 0 };
@@ -113,27 +111,24 @@ class Sensors {
 
     void updateCurrentPos()
     {
-      currentPos[0] = (double) GPS.latitude();
-      currentPos[1] = (double) GPS.longitude();
-      currentPos[2] = (double) GPS.altitude();
+      if (false) {
+        currentPos[0] = 0;//(double) GPS.latitude();
+        currentPos[1] = 0;//(double) GPS.longitude();
+      }
+      else
+      {
+         currentPos[0] = 0;
+        currentPos[1] = 0;
+      }
+      currentPos[2] = ((double) altitudeLaser.getDistance()) / 100;
     }
 
     void updateCurrentSpeed() {
-      float latitude = GPS.latitude();
-      float longitude = GPS.longitude();
-      float altitude = GPS.altitude();
 
-      //Fast estimate TO DO!!!!!!
-      float speed = GPS.speed();
-      float course = GPS.course();
 
-      double Vx = cos(((2 * pi) / 360) * course) * speed;
-      double Vy = sin(((2 * pi) / 360) * course) * speed;
-      double Vz = 8000000;
-
-      currentSpeed[0] = Vx;
-      currentSpeed[1] = Vy;
-      currentSpeed[2] = Vz;
+      currentSpeed[0] = -10000;
+      currentSpeed[1] = -10000;
+      currentSpeed[2] = -10000;
     }
 };
 

@@ -2,41 +2,33 @@
 #include <mbed.h>
 #include <Arduino_PortentaBreakout.h>
 #include "FlightControls.h"
+#include "DataLogger.h"
+#include "Config.h"
 
-int i = 0;
+Config configurationData = Config();
+FlightControls flightSystem = FlightControls(&configurationData);
 
-FlightControls flightControlSystem = FlightControls();
 
 void setup() {
-  Serial.begin(9600);
-  pinMode(LEDR, OUTPUT);
-  pinMode(LEDG, OUTPUT);
-  pinMode(LEDB, OUTPUT);
-  digitalWrite(LEDR, HIGH);
-  digitalWrite(LEDG, HIGH);
-  digitalWrite(LEDB, HIGH);
+  double power = 40;
+  double pitch = 10;
 
-  //Initalise Flight Controls
-  blinkTaskLED(1);
+  
+  Serial.begin(9600);
+  flightSystem.startMotor();
+  Serial.println("Starting Motor");
+  delay(2000);
+  Serial.print("Power:");
+  Serial.print(power);
+  Serial.print("Pitch:");
+  Serial.println(pitch);
+  flightSystem.setThrotle(power);
+  flightSystem.setAilerons(pitch, 0, 0);
+  delay(25000);
+  flightSystem.stopMotor();
 }
 
 void loop() {
-  flightControlSystem.startMotor();
 
 
-}
-}
-
-void blinkTaskLED(int blinks)
-{
-  digitalWrite(LEDR, HIGH);
-  digitalWrite(LEDG, HIGH);
-  digitalWrite(LEDB, HIGH);
-  for ( int i = 0; i < blinks; i++)
-  {
-    digitalWrite(LEDB, LOW);
-    delay(250);
-    digitalWrite(LEDB, HIGH);
-    delay(250);
-  }
 }
