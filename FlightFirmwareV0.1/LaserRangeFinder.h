@@ -28,6 +28,7 @@ class LaserRangeFinder
       write(0x02, 0x80, 0x62);
       write(0x04, 0x08, 0x62);
       write(0x1c, 0x00, 0x62);
+      delay(1500);
       return true;
     }
 

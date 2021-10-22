@@ -10,8 +10,8 @@ FlightControls flightSystem = FlightControls(&configurationData);
 
 
 void setup() {
-  double power = 40;
-  double pitch = 10;
+  double power = 60;
+  double pitch = -40;
 
   
   Serial.begin(9600);

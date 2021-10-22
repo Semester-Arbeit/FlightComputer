@@ -21,6 +21,8 @@ double targetSpeed[3] = {0, 0, 0};
 
 double outputPitch, outputRoll, outputYaw, outputPower;
 
+String startUpStatus = "";
+
 ControlSystem flightControlSystem;
 
 DataLogger flightDataLogger;
@@ -87,6 +89,7 @@ void setup() {
     if (isSerialAvalable)
     {
       Serial.println("PID Configuration Updated");
+
     }
 
 
@@ -108,7 +111,7 @@ void setup() {
     }
     fclose(fp);
     configurationData.setNextKeyFrame(currentNumber.toDouble());
-    
+    startUpStatus += "1,";
     if (isSerialAvalable)
     {
       Serial.println("---Parsed Data---");
@@ -122,14 +125,16 @@ void setup() {
     }
   }
   else
-  { if (isSerialAvalable)
+  {
+    startUpStatus += "0,";
+    if (isSerialAvalable)
     {
       Serial.println("Warning:  Not the correct UPD Commend Received!!");
       Serial.println("          Using default Values vor K");
     }
 
   }
-  
+
   //Initalise WIFI
   blinkTaskLED(1);
   if (isSerialAvalable)
@@ -138,6 +143,7 @@ void setup() {
   }
   status = WiFi.beginAP(ssid, pass);
   Udp.begin(localPort);
+  startUpStatus += "1,";
   if (isSerialAvalable)
   {
     Serial.println("WiFi Status: Okey");
@@ -152,6 +158,7 @@ void setup() {
   }
   if (flightSensors.init())
   {
+    startUpStatus += "1,";
     if (isSerialAvalable)
     {
       Serial.println("Sensors Status: Okey");
@@ -160,6 +167,7 @@ void setup() {
   }
   else
   {
+    startUpStatus += "0,";
     if (isSerialAvalable)
     {
       Serial.println("Sensors Status: Failed");
@@ -178,6 +186,7 @@ void setup() {
   }
   flightSystem.testAilerons();
   digitalWrite(LEDG, LOW);
+  startUpStatus += "1,";
   if (isSerialAvalable)
   {
     Serial.println("Flight Controls Status: Okey");
@@ -192,6 +201,7 @@ void setup() {
   }
   if (flightDataLogger.init())
   {
+    startUpStatus += "1,";
     if (isSerialAvalable)
     {
       Serial.println("Flight Data Logger Status: Okey");
@@ -200,6 +210,7 @@ void setup() {
   }
   else
   {
+    startUpStatus += "0,";
     if (isSerialAvalable)
     {
       Serial.println("Flight Data Logger Status: False");
@@ -218,11 +229,12 @@ void setup() {
   {
     Serial.println("Init Control System");
   }
-  flightControlSystem.init(flightSensors.getAttitude(), flightSensors.getGyro(), flightSensors.getPos(), flightSensors.getSpeed(), targetAtt, targetGyro, targetPos, targetSpeed, &outputPitch, &outputRoll, &outputYaw, &outputPower, configurationData.getKValuesForController()[0], configurationData.getKValuesForController()[1], configurationData.getKValuesForController()[2], configurationData.getKValuesForController()[3]);
+  flightControlSystem.init(flightSensors.getAttitude(), flightSensors.getGyro(), flightSensors.getAlt(), flightSensors.getSpeed(), targetAtt, targetGyro, targetPos, targetSpeed, &outputPitch, &outputRoll, &outputYaw, &outputPower, configurationData.getKValuesForController()[0], configurationData.getKValuesForController()[1], configurationData.getKValuesForController()[2], configurationData.getKValuesForController()[3]);
   if (isSerialAvalable)
   {
     Serial.println(flightControlSystem.getStatus());
   }
+  startUpStatus += "1,";
   flightSensors.getAttitude();
   flightControlSystem.updateValues();
   flightSystem.setAilerons(outputPitch, outputRoll, outputYaw);
@@ -240,6 +252,7 @@ void loop() {
   {
     //Flight Mode
     String telemetryString = "";
+    int gpsUpdate = 0;
     if (packetBuffer[0] == 'L')
     {
       digitalWrite(LEDR, LOW);
@@ -266,11 +279,18 @@ void loop() {
         double * attitude = flightSensors.getAttitude();
         double * gyro = flightSensors.getGyro();
         double* acc = flightSensors.getAcc();
-        double* pos = flightSensors.getPos();
+        int numberOfSattalites = flightSensors.getNumberOfSatellites();
+        if (gpsUpdate >= 200)
+        {
+          flightSensors.updateLocation();
+          gpsUpdate = 0;
+        }
+        double* pos = flightSensors.getAlt();
+        gpsUpdate++;
 
         flightControlSystem.updateValues();
 
-        telemetryString = String(millis()) + "," + String(attitude[0]) + "," + String(attitude[1]) + "," + String(attitude[2]) + "," + String(gyro[0]) + "," + String(gyro[1]) + "," + String(gyro[2]) + "," + String(acc[0]) + "," + String(acc[1]) + "," + String(acc[2]) + "," + String(pos[0]) + "," + String(pos[1]) + "," + String(pos[2]) + "," + String(flightSensors.getNumberOfSatellites()) + "," + String(outputPitch) + "," + String(outputRoll) + "," + String(outputYaw);
+        telemetryString = String(millis()) + "," + String(attitude[0]) + "," + String(attitude[1]) + "," + String(attitude[2]) + "," + String(gyro[0]) + "," + String(gyro[1]) + "," + String(gyro[2]) + "," + String(acc[0]) + "," + String(acc[1]) + "," + String(acc[2]) + "," + String(pos[0]) + "," + String(pos[1]) + "," + String(pos[2]) + "," + String(numberOfSattalites) + "," + String(outputPitch) + "," + String(outputRoll) + "," + String(outputYaw);
         telemetryString.toCharArray(ReplyBuffer, 200);
         sendUdpData(ReplyBuffer);
         flightDataLogger.println(telemetryString);
@@ -319,6 +339,16 @@ void loop() {
       }
       newKValues[m] = currentNumber.toDouble();
       configurationData.setControlSystemValues(newKValues);
+    }
+
+    if (packetBuffer[0] == 'S')
+    {
+      startUpStatus.toCharArray(ReplyBuffer, 200);
+      sendUdpData(ReplyBuffer);
+      delay(1000);
+      telemetryString = "E";
+      telemetryString.toCharArray(ReplyBuffer, 200);
+      sendUdpData(ReplyBuffer);
     }
   }
 }

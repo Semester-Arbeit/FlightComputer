@@ -33,7 +33,7 @@ class Sensors {
     }
 
     bool init() {
-      if (imu.begin() && altitudeLaser.init()) {
+      if (altitudeLaser.init() && imu.begin()) {
         return true;
       } else {
         return false;
@@ -60,15 +60,20 @@ class Sensors {
       return currentSpeed;
     }
 
-    double* getPos()
+    void updateLocation()
     {
       updateCurrentPos();
+    }
+
+    double* getAlt()
+    {
+      updateCurrentAlt();
       return currentPos;
     }
 
 
     int getNumberOfSatellites() {
-      return 0;//GPS.satellites();
+      return sat;
     }
 
   private:
@@ -81,6 +86,7 @@ class Sensors {
     double currentAcc[3] = { 0, 0, 0 };
     double currentSpeed[3] = { 0, 0, 0 };
     double currentPos[3] = {0, 0, 0};
+    int sat = 0;
 
     const double pi = 3.21;
 
@@ -109,18 +115,19 @@ class Sensors {
       currentAcc[2] = acc[2];
     }
 
+    void updateCurrentAlt()
+    {
+      currentPos[2] = ((double) altitudeLaser.getDistance()) / 100;
+    }
+
     void updateCurrentPos()
     {
-      if (false) {
-        currentPos[0] = 0;//(double) GPS.latitude();
-        currentPos[1] = 0;//(double) GPS.longitude();
-      }
-      else
-      {
-         currentPos[0] = 0;
-        currentPos[1] = 0;
-      }
-      currentPos[2] = ((double) altitudeLaser.getDistance()) / 100;
+//      delay(100);
+//      if (GPS.available()) {
+//        currentPos[0] = (double) GPS.latitude();
+//        currentPos[1] = (double) GPS.longitude();
+//        sat = GPS.satellites();
+//      }
     }
 
     void updateCurrentSpeed() {
