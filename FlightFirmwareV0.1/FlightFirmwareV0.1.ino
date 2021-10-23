@@ -234,7 +234,7 @@ void setup() {
   {
     Serial.println(flightControlSystem.getStatus());
   }
-  startUpStatus += "1,";
+  startUpStatus += "1";
   flightSensors.getAttitude();
   flightControlSystem.updateValues();
   flightSystem.setAilerons(outputPitch, outputRoll, outputYaw);

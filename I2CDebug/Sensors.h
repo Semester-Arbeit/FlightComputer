@@ -33,7 +33,7 @@ class Sensors {
     }
 
     bool init() {
-      if (altitudeLaser.init() && imu.begin()) {
+      if (altitudeLaser.init() && imu.begin() && GPS.begin()) {
         return true;
       } else {
         return false;
@@ -122,12 +122,11 @@ class Sensors {
 
     void updateCurrentPos()
     {
-//      delay(100);
-//      if (GPS.available()) {
-//        currentPos[0] = (double) GPS.latitude();
-//        currentPos[1] = (double) GPS.longitude();
-//        sat = GPS.satellites();
-//      }
+      if (GPS.available()) {
+        currentPos[0] = (double) GPS.latitude();
+        currentPos[1] = (double) GPS.longitude();
+        sat = GPS.satellites();
+      }
     }
 
     void updateCurrentSpeed() {

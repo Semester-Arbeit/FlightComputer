@@ -7,7 +7,7 @@
 //The Class to handle the data logging
 //---------------------------------------------------------------------------
 //Version: V0.1
-//Autor: Tobias Rothlin
+//Author: Tobias Rothlin
 //---------------------------------------------------------------------------
 //Methods:
 //
@@ -29,8 +29,8 @@ class DataLogger
       mkdir("fs/LogFiles", 0777);
       if (err == 0)
       {
-        return true;
         isMounted = true;
+        return true;
       }
       else
       {
@@ -51,7 +51,7 @@ class DataLogger
     {
       if (isMounted)
       {
-        String(line + "\r\n").toCharArray(this->lineInFile, 100);
+        String(line + "\r\n").toCharArray(this->lineInFile, 200);
         fprintf(fp, this->lineInFile);
       }
     }
@@ -69,7 +69,7 @@ class DataLogger
   private:
     FILE *fp;
     char fileName[100];
-    char lineInFile[100];
+    char lineInFile[200];
     SDMMCBlockDevice block_device;
     mbed::FATFileSystem fs;
     bool isMounted = false;
