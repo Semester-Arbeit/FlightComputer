@@ -6,7 +6,7 @@
 Sensors flightSensors = Sensors();
 DataLogger flightDataLogger;
 
-double sensPitch, sensRoll, sensYaw, xAcc, yAcc, zAcc, xGyro, yGyro, zGyro,latitude, longitude, altitude;
+double sensPitch, sensRoll, sensYaw, xAcc, yAcc, zAcc, xGyro, yGyro, zGyro, latitude, longitude, altitude;
 
 
 void setup() {
@@ -62,18 +62,27 @@ void setup() {
     xAcc = currentSensorData[0];
     yAcc = currentSensorData[1];
     zAcc = currentSensorData[2];
-    
+
     double* currentPos = flightSensors.getAlt();
     latitude = currentPos[0];
     longitude = currentPos[1];
     altitude = currentPos[2];
 
-    String PrintLine = String(millis()) + "," + String(sensPitch) + "," + String(sensRoll) + "," + String(sensYaw) + ","+ String(xGyro) + ","+ String(yGyro) + ","+ String(zGyro) + ","+ String(xAcc) + ","+ String(yAcc) + ","+ String(zAcc) + "," + String(latitude) + "," + String(longitude) + "," + String(altitude);
+    String PrintLine = String(millis()) + "," + String(sensPitch) + "," + String(sensRoll) + "," + String(sensYaw) + "," + String(xGyro) + "," + String(yGyro) + "," + String(zGyro) + "," + String(xAcc) + "," + String(yAcc) + "," + String(zAcc) + "," + String(latitude) + "," + String(longitude) + "," + String(altitude);
     flightDataLogger.println(PrintLine);
-    Serial.println(PrintLine);
   }
 
   flightDataLogger.close();
+  digitalWrite(LEDR, HIGH);
+  digitalWrite(LEDG, HIGH);
+  digitalWrite(LEDB, HIGH);
+  for ( int i = 0; i < 10; i++)
+  {
+    digitalWrite(LEDG, LOW);
+    delay(250);
+    digitalWrite(LEDG, HIGH);
+    delay(250);
+  }
 }
 
 void loop() {

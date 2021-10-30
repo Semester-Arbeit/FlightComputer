@@ -32,13 +32,13 @@ class FlightControls
       for (int i = 0; i < 4; i++)
       {
         servoFlightControls[i] = Servo();
-        servoFlightControls[i].attach(servoPins[i]);
+        servoFlightControls[i].attach(servoPins[i],1000,2000);
         servoFlightControls[i].write(configurationData->getServoOffsets()[i]);
       }
-      ESC.attach(MotorPin);
-      MotorEnable.attach(MotorEnablePin);
-      ESC.write(0);
-      MotorEnable.write(0);
+      ESC.attach(MotorPin,1000,2000);
+      MotorEnable.attach(MotorEnablePin,1000,2000);
+      ESC.write(0.9*0 + 46.935);
+      MotorEnable.write(0.9*0 + 46.935);
     }
 
     void enterTransportMode()
@@ -47,23 +47,24 @@ class FlightControls
       {
         servoFlightControls[i].write(configurationData->getServoOffsets()[i] - 90);
       }
-      ESC.write(0);
+      ESC.write(0.9*0 + 46.935);
     }
 
     void startMotor()
     {
       setAilerons(0, 0, 0);
-      MotorEnable.write(180);
+      MotorEnable.write(0.9*100 + 46.935);
+      delay(1000);
       for ( int i = 0; i < 30; i++)
       {
-        ESC.write(i);
+        ESC.write(0.9*i + 46.935);
         delay(10);
       }
     }
 
     void stopMotor()
     {
-      MotorEnable.write(0);
+      MotorEnable.write(0.9*0 + 46.935);
       enterTransportMode();
     }
 
@@ -71,15 +72,15 @@ class FlightControls
     {
       if (power < 0)
       {
-        ESC.write(0);
+        ESC.write(0.9*0 + 46.935);
       }
       else if (power > 100)
       {
-        ESC.write(1.8 * 100);
+        ESC.write(0.9*100 + 46.935);
       }
       else
       {
-        ESC.write(1.8 * power);
+        ESC.write(0.9*power + 46.935);
       }
     }
 
@@ -231,7 +232,7 @@ class FlightControls
 
     breakoutPin MotorPin = PWM5;
     breakoutPin MotorEnablePin = PWM0;
-    breakoutPin servoPins[4] = {PWM1, PWM2, PWM3, PWM4};
+    breakoutPin servoPins[4] = {PWM2, PWM1, PWM4, PWM3};
 
     Servo servoFlightControls[4];
     Servo ESC;

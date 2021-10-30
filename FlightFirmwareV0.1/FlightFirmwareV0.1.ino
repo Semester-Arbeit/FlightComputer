@@ -295,7 +295,7 @@ void loop() {
         sendUdpData(ReplyBuffer);
         flightDataLogger.println(telemetryString);
         flightSystem.setAilerons(outputPitch, outputRoll, outputYaw);
-        flightSystem.setThrotle(outputPower);
+        flightSystem.setThrotle(90);
 
         if (isSerialAvalable)
         {
@@ -344,6 +344,17 @@ void loop() {
     if (packetBuffer[0] == 'S')
     {
       startUpStatus.toCharArray(ReplyBuffer, 200);
+      sendUdpData(ReplyBuffer);
+      delay(1000);
+      telemetryString = "E";
+      telemetryString.toCharArray(ReplyBuffer, 200);
+      sendUdpData(ReplyBuffer);
+    }
+
+    if (packetBuffer[0] == 'G')
+    {
+      String reply = flightControlSystem.getConfigParameters();
+      reply.toCharArray(ReplyBuffer, 200);
       sendUdpData(ReplyBuffer);
       delay(1000);
       telemetryString = "E";

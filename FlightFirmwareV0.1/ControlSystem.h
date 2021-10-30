@@ -82,16 +82,39 @@ class ControlSystem
       status += "Yaw I:" + pYaw.getStatus();
       status += "Yaw P:" + pGyroZ.getStatus();
       status += "--------------------------------\n";
-      status += "Pitch I:" + pPosX.getStatus();
-      status += "Pitch P:" + pSpeedX.getStatus();
+      status += "PosX I:" + pPosX.getStatus();
+      status += "PosX P:" + pSpeedX.getStatus();
       status += "--------------------------------\n";
-      status += "Pitch I:" + pPosY.getStatus();
-      status += "Pitch P:" + pSpeedY.getStatus();
+      status += "PosY I:" + pPosY.getStatus();
+      status += "PosY P:" + pSpeedY.getStatus();
       status += "--------------------------------\n";
-      status += "Pitch I:" + pPosZ.getStatus();
-      status += "Pitch P:" + pSpeedZ.getStatus();
+      status += "Alt I:" + pPosZ.getStatus();
+      status += "Alt P:" + pSpeedZ.getStatus();
       status += "--------------------------------\n";
       return status;
+    }
+
+    String getConfigParameters()
+    {
+      String params = "";
+      params += pPitch.getKValue() + ",";
+      params += pGyroX.getKValue() + ",";
+      
+      params += pPosX.getKValue() + ",";
+      params += pSpeedX.getKValue() + ",";
+      
+      params += pRoll.getKValue() + ",";
+      params += pGyroY.getKValue() + ",";
+      
+      params += pPosY.getKValue() + ",";
+      params += pSpeedY.getKValue() + ",";
+      
+      params += pYaw.getKValue() + ",";
+      params += pGyroZ.getKValue() + ",";
+      
+      params += pPosZ.getKValue() + ",";
+      params += pSpeedZ.getKValue();
+      return params;
     }
 
   private:

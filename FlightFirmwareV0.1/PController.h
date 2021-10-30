@@ -39,6 +39,11 @@ class PController
       return status;
     }
 
+    String getKValue()
+    {
+      return String(*Kp);
+    }
+
     
 
   private:
