@@ -218,7 +218,7 @@ void setup() {
     digitalWrite(LEDR, LOW);
   }
   flightDataLogger.open("FlightLog.csv");
-  flightDataLogger.println("Time,sensPitch,sensRoll,sensYaw,xGyro,yGyro,ZGyro,xAcc,yAcc,zAcc,latitude,longitude,alt,Sat,correctionPitch,correctionRoll,correctionYaw");
+  flightDataLogger.println("Time,sensPitch,sensRoll,sensYaw,xGyro,yGyro,ZGyro,xAcc,yAcc,zAcc,latitude,longitude,alt,correctionPitch,correctionRoll,correctionYaw");
   delay(500);
 
 
@@ -260,13 +260,13 @@ void loop() {
       digitalWrite(LEDB, HIGH);
       flightSystem.startMotor();
       delay(500);
-      unsigned long lastExecutionTime = millis();
+      unsigned long lastExecutionTime = micros();
       for (int i = 0; i < 5000; i++)
       {
-        while (millis() - lastExecutionTime < 10)
+        while (micros() - lastExecutionTime < 10000)
         {
         }
-        lastExecutionTime = millis();
+        lastExecutionTime = micros();
         if (getNewUDPPackets())
         {
           if (packetBuffer[0] == 'A')
@@ -279,8 +279,7 @@ void loop() {
         double * attitude = flightSensors.getAttitude();
         double * gyro = flightSensors.getGyro();
         double* acc = flightSensors.getAcc();
-        int numberOfSattalites = flightSensors.getNumberOfSatellites();
-        if (gpsUpdate >= 200)
+        if (gpsUpdate >= 100)
         {
           flightSensors.updateLocation();
           gpsUpdate = 0;
@@ -290,10 +289,10 @@ void loop() {
 
         flightControlSystem.updateValues();
 
-        telemetryString = String(millis()) + "," + String(attitude[0]) + "," + String(attitude[1]) + "," + String(attitude[2]) + "," + String(gyro[0]) + "," + String(gyro[1]) + "," + String(gyro[2]) + "," + String(acc[0]) + "," + String(acc[1]) + "," + String(acc[2]) + "," + String(pos[0]) + "," + String(pos[1]) + "," + String(pos[2]) + "," + String(numberOfSattalites) + "," + String(outputPitch) + "," + String(outputRoll) + "," + String(outputYaw);
+        telemetryString = String(lastExecutionTime) + "," + String(attitude[0]) + "," + String(attitude[1]) + "," + String(attitude[2]) + "," + String(gyro[0]) + "," + String(gyro[1]) + "," + String(gyro[2]) + "," + String(acc[0]) + "," + String(acc[1]) + "," + String(acc[2]) + "," + String(pos[0]) + "," + String(pos[1]) + "," + String(pos[2])  + "," + String(outputPitch) + "," + String(outputRoll) + "," + String(outputYaw);
         telemetryString.toCharArray(ReplyBuffer, 200);
         sendUdpData(ReplyBuffer);
-        flightDataLogger.println(telemetryString);
+        flightDataLogger.println(ReplyBuffer);
         flightSystem.setAilerons(outputPitch, outputRoll, outputYaw);
         flightSystem.setThrotle(90);
 
@@ -305,11 +304,12 @@ void loop() {
       telemetryString = "E";
       telemetryString.toCharArray(ReplyBuffer, 200);
       sendUdpData(ReplyBuffer);
+      flightDataLogger.close();
       digitalWrite(LEDR, HIGH);
       digitalWrite(LEDG, LOW);
       digitalWrite(LEDB, HIGH);
       flightSystem.stopMotor();
-      flightDataLogger.close();
+      
     }
 
     if (packetBuffer[0] == 'P')

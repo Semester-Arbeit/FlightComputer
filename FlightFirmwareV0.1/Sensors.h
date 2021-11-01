@@ -1,7 +1,6 @@
 #ifndef SENSORS_H_
 #define SENSORS_H_
 
-#include <Adafruit_BNO055.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
@@ -9,7 +8,7 @@
 #include <mbed.h>
 #include <Arduino_PortentaBreakout.h>
 #include "LaserRangeFinder.h"
-#include <Arduino_MKRGPS.h>
+#include "SPIGPS.h"
 
 
 //The Class to interface between the Firmware and the IMU/GPS.
@@ -33,7 +32,7 @@ class Sensors {
     }
 
     bool init() {
-      if (altitudeLaser.init() && imu.begin()) {
+      if (altitudeLaser.init() && imu.begin() && myGPS.init()) {
         return true;
       } else {
         return false;
@@ -79,6 +78,7 @@ class Sensors {
   private:
     Adafruit_BNO055 imu = Adafruit_BNO055(55);
     LaserRangeFinder altitudeLaser = LaserRangeFinder();
+    SPIGPS myGPS = SPIGPS();
 
 
     double currentAttitude[3] = { 0, 0, 0 };
@@ -122,12 +122,9 @@ class Sensors {
 
     void updateCurrentPos()
     {
-//      delay(100);
-//      if (GPS.available()) {
-//        currentPos[0] = (double) GPS.latitude();
-//        currentPos[1] = (double) GPS.longitude();
-//        sat = GPS.satellites();
-//      }
+      double* res = myGPS.getPos();
+      currentPos[0] = res[0];
+      currentPos[1] = res[1];
     }
 
     void updateCurrentSpeed() {
