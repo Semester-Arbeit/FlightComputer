@@ -98,22 +98,22 @@ class ControlSystem
     {
       String params = "";
       params += pPitch.getKValue() + ",";
-      params += pGyroX.getKValue() + ",";
-      
-      params += pPosX.getKValue() + ",";
-      params += pSpeedX.getKValue() + ",";
-      
       params += pRoll.getKValue() + ",";
-      params += pGyroY.getKValue() + ",";
-      
-      params += pPosY.getKValue() + ",";
-      params += pSpeedY.getKValue() + ",";
-      
       params += pYaw.getKValue() + ",";
+      
+      params += pGyroX.getKValue() + ",";
+      params += pGyroY.getKValue() + ",";
       params += pGyroZ.getKValue() + ",";
       
+      
+      params += pPosX.getKValue() + ",";
+      params += pPosY.getKValue() + ",";
       params += pPosZ.getKValue() + ",";
+      
+      params += pSpeedX.getKValue() + ",";
+      params += pSpeedY.getKValue() + ",";
       params += pSpeedZ.getKValue();
+      
       return params;
     }
 

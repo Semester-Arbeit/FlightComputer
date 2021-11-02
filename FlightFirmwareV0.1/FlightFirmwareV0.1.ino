@@ -252,7 +252,7 @@ void loop() {
   {
     //Flight Mode
     String telemetryString = "";
-    int gpsUpdate = 0;
+    int gpsUpdate = 100;
     if (packetBuffer[0] == 'L')
     {
       digitalWrite(LEDR, LOW);
@@ -271,8 +271,8 @@ void loop() {
         {
           if (packetBuffer[0] == 'A')
           {
-            flightSystem.stopMotor();
             flightDataLogger.close();
+            flightSystem.stopMotor();
             break;
           }
         }
@@ -343,6 +343,7 @@ void loop() {
 
     if (packetBuffer[0] == 'S')
     {
+      delay(1500);
       startUpStatus.toCharArray(ReplyBuffer, 200);
       sendUdpData(ReplyBuffer);
       delay(1000);

@@ -52,7 +52,7 @@ void setup()
 void loop()                     // run over and over again
 {
   char c = GPS.read();
-
+  Serial.println(GPS.satellites);
   // if a sentence is received, we can check the checksum, parse it...
   if (GPS.newNMEAreceived())
   {
