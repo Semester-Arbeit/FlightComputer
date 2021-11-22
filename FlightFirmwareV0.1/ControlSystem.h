@@ -64,8 +64,8 @@ class ControlSystem
       pSpeedY.updateValues();
       pSpeedZ.updateValues();
 
-      *driverOutputPitch = pOutPitch + pOutGyroX + pOutPosX + pOutSpeedX;
-      *driverOutputRoll = pOutRoll + pOutGyroY + pOutPosY + pOutSpeedY;
+      *driverOutputPitch = pOutPitch + pOutGyroX - pOutPosX - pOutSpeedX;
+      *driverOutputRoll = pOutRoll + pOutGyroY - pOutPosY - pOutSpeedY;
       *driverOutputYaw = pOutYaw + pOutGyroZ;
       *driverOutPower = pOutPosZ + pOutSpeedZ;
     }

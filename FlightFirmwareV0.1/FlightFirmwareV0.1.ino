@@ -218,7 +218,7 @@ void setup() {
     digitalWrite(LEDR, LOW);
   }
   flightDataLogger.open("FlightLog.csv");
-  flightDataLogger.println("Time,sensPitch,sensRoll,sensYaw,xGyro,yGyro,ZGyro,xAcc,yAcc,zAcc,latitude,longitude,alt,correctionPitch,correctionRoll,correctionYaw");
+  flightDataLogger.println("Time,sensPitch,sensRoll,sensYaw,xGyro,yGyro,ZGyro,xAcc,yAcc,zAcc,latitude,longitude,alt,cP,cR,cY");
   delay(500);
 
 
@@ -271,8 +271,11 @@ void loop() {
         {
           if (packetBuffer[0] == 'A')
           {
-            flightDataLogger.close();
             flightSystem.stopMotor();
+            flightDataLogger.close();
+            digitalWrite(LEDR, HIGH);
+            digitalWrite(LEDG, LOW);
+            digitalWrite(LEDB, HIGH);
             break;
           }
         }
@@ -285,6 +288,7 @@ void loop() {
           gpsUpdate = 0;
         }
         double* pos = flightSensors.getAlt();
+        double* speed = flightSensors.getSpeed();
         gpsUpdate++;
 
         flightControlSystem.updateValues();
@@ -309,7 +313,7 @@ void loop() {
       digitalWrite(LEDG, LOW);
       digitalWrite(LEDB, HIGH);
       flightSystem.stopMotor();
-      
+
     }
 
     if (packetBuffer[0] == 'P')
@@ -350,6 +354,28 @@ void loop() {
       telemetryString = "E";
       telemetryString.toCharArray(ReplyBuffer, 200);
       sendUdpData(ReplyBuffer);
+    }
+
+    if (packetBuffer[0] == 'I')
+    {
+      digitalWrite(LEDR, LOW);
+      digitalWrite(LEDG, HIGH);
+      digitalWrite(LEDB, HIGH);
+      double * attitude = flightSensors.getAttitude();
+      double * gyro = flightSensors.getGyro();
+      double* acc = flightSensors.getAcc();
+      flightSensors.updateLocation();
+      double* pos = flightSensors.getAlt();
+      telemetryString = String(micros()) + "," + String(attitude[0]) + "," + String(attitude[1]) + "," + String(attitude[2]) + "," + String(gyro[0]) + "," + String(gyro[1]) + "," + String(gyro[2]) + "," + String(acc[0]) + "," + String(acc[1]) + "," + String(acc[2]) + "," + String(pos[0]) + "," + String(pos[1]) + "," + String(pos[2])  + "," + String(outputPitch) + "," + String(outputRoll) + "," + String(outputYaw);
+      telemetryString.toCharArray(ReplyBuffer, 200);
+      sendUdpData(ReplyBuffer);
+      delay(500);
+      telemetryString = "E";
+      telemetryString.toCharArray(ReplyBuffer, 200);
+      sendUdpData(ReplyBuffer);
+      digitalWrite(LEDR, HIGH);
+      digitalWrite(LEDG, LOW);
+      digitalWrite(LEDB, HIGH);
     }
 
     if (packetBuffer[0] == 'G')

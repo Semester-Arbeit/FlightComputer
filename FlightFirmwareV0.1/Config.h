@@ -87,8 +87,8 @@ class Config
   private:
 
     //FLight Controls values:
-    const double defaultServoOffset = 90;
-    double servoOffset[4] = {defaultServoOffset + 2, defaultServoOffset + 2.5, defaultServoOffset + 8.5, defaultServoOffset + 10};
+    const double defaultServoOffset = 45;
+    double servoOffset[4] = {defaultServoOffset + 0, defaultServoOffset + 0, defaultServoOffset + 0, defaultServoOffset + 0};
 
 
     //Control System: Kp,Ki

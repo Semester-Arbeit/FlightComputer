@@ -98,20 +98,20 @@ class Sensors {
       if (yaw > 180) {
         yaw = yaw - 360;
       }
-      currentAttitude[2] = yaw;
+      currentAttitude[2] = -yaw;
     }
 
     void updateGyroData() {
       imu::Vector<3> gyro = imu.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
       currentGyro[0] = gyro[0];
-      currentGyro[1] = gyro[1];
+      currentGyro[1] = -gyro[1];
       currentGyro[2] = gyro[2];
     }
 
     void updateAccData() {
       imu::Vector<3> acc = imu.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
       currentAcc[0] = acc[0];
-      currentAcc[1] = acc[1];
+      currentAcc[1] = -acc[1];
       currentAcc[2] = acc[2];
     }
 
@@ -128,8 +128,6 @@ class Sensors {
     }
 
     void updateCurrentSpeed() {
-
-
       currentSpeed[0] = -10000;
       currentSpeed[1] = -10000;
       currentSpeed[2] = -10000;

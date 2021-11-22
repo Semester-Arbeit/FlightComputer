@@ -33,7 +33,7 @@ class FlightControls
       {
         servoFlightControls[i] = Servo();
         servoFlightControls[i].attach(servoPins[i],1000,2000);
-        servoFlightControls[i].write(configurationData->getServoOffsets()[i]);
+        servoFlightControls[i].write(0.9*configurationData->getServoOffsets()[i]+ 46.935);
       }
       ESC.attach(MotorPin,1000,2000);
       MotorEnable.attach(MotorEnablePin,1000,2000);
@@ -45,7 +45,7 @@ class FlightControls
     {
       for (int i = 0; i < 4; i++)
       {
-        servoFlightControls[i].write(configurationData->getServoOffsets()[i] - 90);
+        servoFlightControls[i].write(0.9 * ((configurationData->getServoOffsets()[i] - 90)) + 46.935);
       }
       ESC.write(0.9*0 + 46.935);
     }
@@ -165,10 +165,10 @@ class FlightControls
         }
       }
 
-      servoFlightControls[0].write(configurationData->getServoOffsets()[0] - rollXn);
-      servoFlightControls[1].write(configurationData->getServoOffsets()[1] - pitchYp);
-      servoFlightControls[2].write(configurationData->getServoOffsets()[2] - rollXp);
-      servoFlightControls[3].write(configurationData->getServoOffsets()[3] - pitchYn);
+      servoFlightControls[0].write(0.9 * (configurationData->getServoOffsets()[0] - rollXn) + 46.935);
+      servoFlightControls[1].write(0.9 * (configurationData->getServoOffsets()[1] - pitchYn) + 46.935);
+      servoFlightControls[2].write(0.9 * (configurationData->getServoOffsets()[2] - rollXp) + 46.935);
+      servoFlightControls[3].write(0.9 * (configurationData->getServoOffsets()[3] - pitchYp) + 46.935);
       return !maxReached;
     }
 
@@ -223,7 +223,7 @@ class FlightControls
     }
 
   private:
-    const double stallAngle = 30;
+    const double stallAngle = 25;
     const double squareStallAngle = stallAngle * stallAngle; //used to decide if the courrent Angle is greater than the stall angle.
 
     Config* configurationData = nullptr;
@@ -232,7 +232,7 @@ class FlightControls
 
     breakoutPin MotorPin = PWM5;
     breakoutPin MotorEnablePin = PWM0;
-    breakoutPin servoPins[4] = {PWM2, PWM1, PWM4, PWM3};
+    breakoutPin servoPins[4] = {PWM1, PWM2, PWM3, PWM4};
 
     Servo servoFlightControls[4];
     Servo ESC;
