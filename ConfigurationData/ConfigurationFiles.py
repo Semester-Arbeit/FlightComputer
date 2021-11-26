@@ -1,3 +1,6 @@
+import plotly.express as px
+import numpy as np
+import pandas
 
 def generateKvalues(DictOfValues):
     with open("KValues.csv", 'w') as kvalues:
@@ -15,6 +18,34 @@ def generateKvalues(DictOfValues):
         kvalues.write(str(DictOfValues['AltKp'])+'\n')
 
 
+def generateAltMap(maxAlt, acccendSteepness, decentSteepness, groundClerance):
+    timeBase = np.linspace(0,4999,5000)
+    timeBaseAccend = np.linspace(0,2499,2500)
+    timeBaseDecend = np.linspace(2499, 0, 2500)
+
+    p1 = 7
+    a1 = 1/acccendSteepness
+
+    p2 = 7
+    a2 = 1/decentSteepness
+
+    altValuesAccend = np.round(groundClerance+(maxAlt * 1/(1+np.exp(-((timeBaseAccend/a1)-p1)))),2)
+    altValuesDecend = np.round(groundClerance+(maxAlt * 1/(1+np.exp(-((timeBaseDecend/a2)-p2)))), 2)
+    altValue = np.hstack((altValuesAccend,altValuesDecend))
+
+    fig = px.scatter(x= timeBase,y = altValue)
+    fig.show()
+    with open("AltitudeProfile.csv", 'w') as altFile:
+        for i, alt in zip(range(len(altValue[:-1])), altValue[:-1]):
+            print(i,alt, sep=":")
+            altFile.write(str(alt) + ',')
+        altFile.write(str(altValue[-1]) + '\n')
+
+
+
+
+
+
 
 
 kvalues = { 'PitchKi':1,'PitchKp':1,'XPosKi':0,'XPosKp':0,
@@ -22,3 +53,4 @@ kvalues = { 'PitchKi':1,'PitchKp':1,'XPosKi':0,'XPosKp':0,
             'YawKi':0,'YawKp':0,'AltKi':0,'AltKp':0 }
 
 generateKvalues(kvalues)
+generateAltMap(0.5,0.01,0.005,0.55)
