@@ -23,10 +23,10 @@ def generateAltMap(maxAlt, acccendSteepness, decentSteepness, groundClerance):
     timeBaseAccend = np.linspace(0,2499,2500)
     timeBaseDecend = np.linspace(2499, 0, 2500)
 
-    p1 = 7
+    p1 = 5
     a1 = 1/acccendSteepness
 
-    p2 = 7
+    p2 = 5
     a2 = 1/decentSteepness
 
     altValuesAccend = np.round(groundClerance+(maxAlt * 1/(1+np.exp(-((timeBaseAccend/a1)-p1)))),2)
@@ -53,4 +53,4 @@ kvalues = { 'PitchKi':1,'PitchKp':1,'XPosKi':0,'XPosKp':0,
             'YawKi':0,'YawKp':0,'AltKi':0,'AltKp':0 }
 
 generateKvalues(kvalues)
-generateAltMap(0.5,0.01,0.005,0.55)
+generateAltMap(0.5,0.02,0.005,0.55)

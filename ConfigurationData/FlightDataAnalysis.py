@@ -2,7 +2,7 @@ import sys
 
 def analyseFlightData(filepath):
     Data = {}
-    cycleTimeCutOff = 10500
+    cycleTimeCutOff = 11000
 
     NumberOfOverTimes = 0
     MaxCycleTime = 0
@@ -29,11 +29,12 @@ def analyseFlightData(filepath):
         for i, header in zip(range(len(headerList)),headerList):
             Data.update({header:lineLists[i]})
 
-    for i in range(len(Data['Time'][:-1])):
+    for i in range(len(Data['Time'])-2):
         try:
-            next = int(Data['Time'][i+1])
-            current = int(Data['Time'][i])
+            next = float(Data['Time'][i+1])
+            current = float(Data['Time'][i])
             res = next - current
+            print(i,res,sep=";")
             AverageTime += res
             if res > MaxCycleTime:
                 MaxCycleTime = res
@@ -43,7 +44,8 @@ def analyseFlightData(filepath):
 
             if (res > cycleTimeCutOff):
                 NumberOfOverTimes += 1
-        except:
+        except():
+            print(Data['Time'][i+1],"-",Data['Time'][i])
             print("!!Error!!")
 
 
@@ -67,6 +69,8 @@ def analyseFlightData(filepath):
                 ListOfErrorCells.append([key.replace('\n',''),i,element])
     #Report
 
+
+
     print("-------------------------Status Report----------------------------")
     print("Overview:")
     print(f"            Number of entries           : {len(Data[[*Data][0]]):3d} (5000)")
@@ -77,7 +81,9 @@ def analyseFlightData(filepath):
     print(f"            Min line Lenght             : {MinLineLenght:3d}")
     print()
     print("Time Report:")
-    print(f"            Average                     : {(AverageTime/len(Data[[*Data][0]]))/1000:<7.3f}ms -> {1/((AverageTime/len(Data[[*Data][0]]))/1000000)} hz -> Flight Time: {((AverageTime/len(Data[[*Data][0]]))/1000000)*5000}s")
+    n = len(Data[[*Data][0]])
+    print(AverageTime)
+    print(f"            Average                     : {(AverageTime/n)/1000:<7.3f}ms -> {1/((AverageTime/n)/1000000)} hz -> Flight Time: {((AverageTime/n)/1000000)*5000}s")
     print(f"            MaxCycle                    : {MaxCycleTime:<7}us -> {MaxCycleTime/1000:.2f}ms")
     print(f"            MinCycle                    : {MinCycleTime:<7}us -> {MinCycleTime/1000:.2f}ms")
     print(f"            NumberOfOver                : {NumberOfOverTimes} > {cycleTimeCutOff}")

@@ -110,8 +110,8 @@ class Sensors {
 
     void updateGyroData() {
       imu::Vector<3> gyro = imu.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-      currentGyro[0] = gyro[0];
-      currentGyro[1] = -gyro[1];
+      currentGyro[0] = gyro[1];
+      currentGyro[1] = -gyro[0];
       currentGyro[2] = gyro[2];
     }
 

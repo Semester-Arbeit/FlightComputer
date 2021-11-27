@@ -226,8 +226,8 @@ void setup() {
     digitalWrite(LEDR, LOW);
   }
   flightDataLogger.open("FlightLog.csv");
-  char csvHeader[150] = "Time,Pitch,Roll,Yaw,xGyro,yGyro,ZGyro,xAcc,yAcc,zAcc,latitude,longitude,alt,xSpeed,ySpeed,zSpeed,cP,cR,cY,cP,OF";
-  flightDataLogger.println(csvHeader);
+  char csvHeader[] = "Time,Pitch,Roll,Yaw,xGyro,yGyro,ZGyro,xAcc,yAcc,zAcc,latitude,longitude,alt,xSpeed,ySpeed,zSpeed,cP,cR,cY,cP";
+  flightDataLogger.setHeader(csvHeader, sizeof(csvHeader)/sizeof(csvHeader[0]));
   delay(500);
 
 
@@ -305,12 +305,16 @@ void loop() {
           targetPos[2] = configurationData.getAllKeyFrames()[i];
           flightControlSystem.updateValues();
 
-          telemetryString = String(lastExecutionTime) + "," + String(attitude[0]) + "," + String(attitude[1]) + "," + String(attitude[2]) + "," + String(gyro[0]) + "," + String(gyro[1]) + "," + String(gyro[2]) + "," + String(acc[0]) + "," + String(acc[1]) + "," + String(acc[2]) + "," + String(pos[0]) + "," + String(pos[1]) + "," + String(pos[2])  + "," + String(speed[0]) +  "," + String(speed[1]) + "," + String(speed[2]) + "," + String(outputPitch) + "," + String(outputRoll) + "," + String(outputYaw) + "," + String(outputPower) + ",";
-          telemetryString.toCharArray(ReplyBuffer, 200);
-          sendUdpData(ReplyBuffer);
-          flightDataLogger.println(ReplyBuffer);
+          //telemetryString = String(lastExecutionTime) + "," + String(attitude[0]) + "," + String(attitude[1]) + "," + String(attitude[2]) + "," + String(gyro[0]) + "," + String(gyro[1]) + "," + String(gyro[2]) + "," + String(acc[0]) + "," + String(acc[1]) + "," + String(acc[2]) + "," + String(pos[0]) + "," + String(pos[1]) + "," + String(pos[2])  + "," + String(speed[0]) +  "," + String(speed[1]) + "," + String(speed[2]) + "," + String(outputPitch) + "," + String(outputRoll) + "," + String(outputYaw) + "," + String(outputPower) + ",";
+          //telemetryString.toCharArray(ReplyBuffer, 200);
+          //sendUdpData(ReplyBuffer);
 
-          
+          double tempLastExecutionTimeAsDouble = (double)lastExecutionTime;
+          double rawDataPointers[20] = {tempLastExecutionTimeAsDouble, attitude[0], attitude[1], attitude[2], gyro[0], gyro[1], gyro[2], acc[0], acc[1], acc[2], pos[0], pos[1], pos[2], speed[0], speed[1], speed[2], outputPitch, outputRoll, outputYaw, outputPower};
+          flightDataLogger.println(rawDataPointers);
+          sendUdpTelemetry(rawDataPointers);
+
+
           flightSystem.setAilerons(outputPitch, outputRoll, outputYaw);
           flightSystem.setThrotle(75 + outputPower);
 
@@ -398,13 +402,13 @@ void loop() {
       isCalibrated = true;
       startUpStatus += "1,";
       if (isSerialAvalable)
-          {
-            Serial.println("Calibrated Seonsor Data");
-            Serial.print("                        zAcc: Alpha = ");
-            Serial.print(alpha);
-            Serial.print(" Offset = ");
-            Serial.println(average / numberOfMeasurements);
-          }
+      {
+        Serial.println("Calibrated Seonsor Data");
+        Serial.print("                        zAcc: Alpha = ");
+        Serial.print(alpha);
+        Serial.print(" Offset = ");
+        Serial.println(average / numberOfMeasurements);
+      }
     }
 
     if (packetBuffer[0] == 'I')
@@ -478,5 +482,12 @@ void sendUdpData(char * dataToSend)
 {
   Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
   Udp.write(dataToSend);
+  Udp.endPacket();
+}
+
+void sendUdpTelemetry(double* data)
+{
+  Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+  Udp.write((byte*)data,8*20);
   Udp.endPacket();
 }
